@@ -3,6 +3,6 @@
 
 #add_library(ADDLIB add.cpp)
 
-add_executable(chkservice main.cpp)
+add_executable(chkservice chkservice.cpp)
 target_link_libraries(chkservice ${LIBS})
 

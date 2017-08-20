@@ -1,4 +1,6 @@
 language: c++
+env:
+  - DEBUG=1
 addons:
   apt:
     sources:
