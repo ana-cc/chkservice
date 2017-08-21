@@ -3,7 +3,7 @@
 #include <iostream>
 #include <catch.hpp>
 
-TEST_CASE( "Factorials are computed", "[factorial]" ) {
+TEST_CASE( "should initialize tests", "[Catch]" ) {
   REQUIRE( 1 == 1 );
 }
 
