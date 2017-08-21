@@ -5,7 +5,7 @@
 
 using namespace std;
 
-TEST_CASE("should create object", "[ChkBus]") {
+TEST_CASE("should create object bus", "[ChkBus]") {
   ChkBus *bus = new ChkBus();
 
   REQUIRE(bus != NULL);
