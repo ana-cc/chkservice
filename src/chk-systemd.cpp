@@ -63,6 +63,10 @@ const char *ChkBus::getState(const char *name) {
   int status;
   const char *state;
 
+  if (!isConnected()) {
+    connect();
+  }
+
   sd_bus_message *busMessage = NULL;
   sd_bus_error error = SD_BUS_ERROR_NULL;
 
@@ -96,7 +100,7 @@ const char *ChkBus::getState(const char *name) {
       throw std::string(errorMessage);
     }
 
-  return status < 0 ?  NULL : strdup(state);
+  return status < 0 ? NULL : strdup(state);
 }
 
 std::vector<UnitInfo> ChkBus::getUnits() {
@@ -206,8 +210,9 @@ void ChkBus::reloadDaemon() {
     }
 }
 
-void ChkBus::callUnit(const char *method, char **names, bool force) {
+void ChkBus::applyUnitState(const char *method, char **names, int flags) {
   int status;
+  bool checkState = false;
 
   sd_bus_error error = SD_BUS_ERROR_NULL;
   sd_bus_message *busMessage = NULL;
@@ -225,7 +230,7 @@ void ChkBus::callUnit(const char *method, char **names, bool force) {
     method);
 
   if (status < 0) {
-    setErrorMessage(error.message);
+    setErrorMessage(status);
     goto finish;
   }
 
@@ -236,10 +241,20 @@ void ChkBus::callUnit(const char *method, char **names, bool force) {
     goto finish;
   }
 
-  if (force) {
-    status = sd_bus_message_append(busMessage, "bb", true, true);
-  } else {
-    status = sd_bus_message_append(busMessage, "b", true);
+  switch(flags) {
+    case STATE_FLAGS_ENABLE:
+      status = sd_bus_message_append(busMessage, "bb", true, true);
+      break;
+    case STATE_FLAGS_DISABLE:
+      status = sd_bus_message_append(busMessage, "b", true);
+      checkState = true;
+      break;
+    case STATE_FLAGS_DISABLE_ISO:
+      status = sd_bus_message_append(busMessage, "b", false);
+      checkState = true;
+      break;
+    default:
+      break;
   }
 
   if (status < 0) {
@@ -254,7 +269,64 @@ void ChkBus::callUnit(const char *method, char **names, bool force) {
     goto finish;
   }
 
-  std::cout << method << "ll is ok..." << std::endl;
+  finish:
+    sd_bus_error_free(&error);
+    sd_bus_message_unref(busMessage);
+    disconnect();
+
+    if (status < 0) {
+      throw std::string(errorMessage);
+    }
+
+  if (checkState) {
+    checkDisabledStatus(names);
+  }
+}
+
+void ChkBus::checkDisabledStatus(char **names) {
+  for (int i = 0; names[i] != NULL; i++) {
+    const char *name = names[i];
+    const char *state = getState(name);
+
+    if (std::string(state).find("enabled") == 0) {
+      applyUnitState("DisableUnitFiles", names, STATE_FLAGS_DISABLE_ISO);
+      applyUnitState("DisableUnitFiles", names, STATE_FLAGS_DISABLE);
+    }
+
+    if (state != NULL) {
+      free((void *)state);
+    }
+  }
+}
+
+void ChkBus::applyUnitSub(const char *name, const char *method) {
+  int status;
+
+  sd_bus_error error = SD_BUS_ERROR_NULL;
+  sd_bus_message *busMessage = NULL;
+  sd_bus_message *reply = NULL;
+
+  if (!isConnected()) {
+    connect();
+  }
+
+  status = sd_bus_call_method(
+    bus,
+    "org.freedesktop.systemd1",
+    "/org/freedesktop/systemd1",
+    "org.freedesktop.systemd1.Manager",
+    method,
+    &error,
+    &reply,
+    "ss",
+    name,
+    "replace-irreversibly");
+
+  if (status < 0) {
+    setErrorMessage(error.message);
+    goto finish;
+  }
+
   finish:
     sd_bus_error_free(&error);
     sd_bus_message_unref(busMessage);
@@ -267,6 +339,11 @@ void ChkBus::callUnit(const char *method, char **names, bool force) {
 
 void ChkBus::enableUnits(std::set<std::string> *ids) {
   int i = 0;
+
+  if (ids->size() < 1) {
+    return;
+  }
+
   char *names[ids->size()];
 
   for (auto id : (*ids)) {
@@ -275,20 +352,26 @@ void ChkBus::enableUnits(std::set<std::string> *ids) {
   }
   names[i] = NULL;
 
-  callUnit("EnableUnitFiles", names, true);
+  applyUnitState("EnableUnitFiles", names, STATE_FLAGS_ENABLE);
 }
 
 void ChkBus::disableUnits(std::set<std::string> *ids) {
   int i = 0;
+
+  if (ids->size() < 1) {
+    return;
+  }
+
   char *names[ids->size()];
 
   for (auto id : (*ids)) {
     names[i] = (char *) id.c_str();
     i++;
   }
+
   names[i] = NULL;
 
-  callUnit("DisableUnitFiles", names, false);
+  applyUnitState("DisableUnitFiles", names, STATE_FLAGS_DISABLE);
 }
 
 void ChkBus::enableUnit(const char *name) {
@@ -310,3 +393,24 @@ void ChkBus::disableUnit(const char *name) {
     throw err;
   }
 }
+
+void ChkBus::stopUnits(std::set<std::string> *ids) {
+  for (auto id : (*ids)) {
+    applyUnitSub(id.c_str(), "StopUnit");
+  }
+}
+
+void ChkBus::startUnits(std::set<std::string> *ids) {
+  for (auto id : (*ids)) {
+    applyUnitSub(id.c_str(), "StartUnit");
+  }
+}
+
+void ChkBus::stopUnit(const char *name) {
+  applyUnitSub(name, "StopUnit");
+}
+
+void ChkBus::startUnit(const char *name) {
+  applyUnitSub(name, "StartUnit");
+}
+

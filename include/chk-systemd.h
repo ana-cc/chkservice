@@ -8,6 +8,12 @@
 
 #define ERR_PREFIX "Failed: "
 
+enum STATE_FLAGS {
+  STATE_FLAGS_ENABLE,
+  STATE_FLAGS_DISABLE,
+  STATE_FLAGS_DISABLE_ISO
+};
+
 typedef struct UnitInfo {
   const char *id;
   const char *description;
@@ -41,13 +47,20 @@ class ChkBus {
     void disableUnits(std::set<std::string> *ids);
     void enableUnits(std::set<std::string> *ids);
 
+    void startUnit(const char *name);
+    void stopUnit(const char *name);
+    void startUnits(std::set<std::string> *ids);
+    void stopUnits(std::set<std::string> *ids);
+
     void reloadDaemon();
 
   private:
     sd_bus* bus = NULL;
     std::string errorMessage;
     const char* getState(const char *name);
-    void callUnit(const char *method, char **names, bool force);
+    void applyUnitState(const char *method, char **names, int flags);
+    void applyUnitSub(const char *name, const char *method);
+    void checkDisabledStatus(char **names);
 };
 
 int busParseUnit(sd_bus_message *message, UnitInfo *u);

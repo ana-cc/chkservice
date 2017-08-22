@@ -49,15 +49,45 @@ TEST_CASE("should get list of units", "[ChkBus]") {
   delete bus;
 }
 
-#include <unistd.h>
-
-TEST_CASE("should be able disable/enable unit", "[ChkBus]") {
+TEST_CASE("should be able enable/disable unit", "[ChkBus]") {
   ChkBus *bus = new ChkBus();
 
-  REQUIRE_NOTHROW(bus->disableUnit("ssh.service"));
   REQUIRE_NOTHROW(bus->enableUnit("ssh.service"));
   REQUIRE_NOTHROW(bus->reloadDaemon());
+
+  for (auto unit : bus->getUnits()) {
+    if (string(unit.id).find("ssh.service") == 0) {
+      REQUIRE(string(unit.state).find("enabled") == 0);
+      break;
+    }
+  }
+
+  REQUIRE_NOTHROW(bus->disableUnit("ssh.service"));
+  REQUIRE_NOTHROW(bus->reloadDaemon());
+
+  for (auto unit : bus->getUnits()) {
+    if (string(unit.id).find("ssh.service") == 0) {
+      REQUIRE(string(unit.state).find("disabled") == 0);
+      break;
+    }
+  }
 
   delete bus;
 }
 
+TEST_CASE("should be able start/stop unit", "[ChkBus]") {
+  ChkBus *bus = new ChkBus();
+
+//  REQUIRE_NOTHROW(bus->stopUnit("ssh.service"));
+
+  for (auto unit : bus->getUnits()) {
+    if (string(unit.id).find("ssh.service") == 0) {
+      cout << "state >> " <<  unit.state << endl;
+
+//      REQUIRE(string(unit.state).find("enabled") == 0);
+      break;
+    }
+  }
+
+  delete bus;
+}
