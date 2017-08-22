@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <set>
 
 #include "chk-ctl.h"
 #include "chk-systemd.h"
@@ -12,16 +13,22 @@ ChkCTL::~ChkCTL() {
   items.clear();
 }
 
+void ChkCTL::updateItems() {
+  items.clear();
+  fetch();
+}
+
 std::vector<UnitItem *> ChkCTL::getItems() {
-  if (items.size() < 1) {
+  if (items.empty()) {
     fetch();
   }
+
   sortByName(&items);
   return items;
 }
 
 std::vector<UnitItem *> ChkCTL::getByTarget(const char *target) {
-  if (items.size() < 1) {
+  if (items.empty()) {
     fetch();
   }
 
@@ -35,7 +42,6 @@ std::vector<UnitItem *> ChkCTL::getByTarget(const char *target) {
   }
 
   sortByName(&found);
-
   return found;
 }
 
@@ -66,3 +72,23 @@ void ChkCTL::pushItem(UnitInfo unit) {
 
   items.push_back(item);
 };
+
+std::vector<UnitItem *> ChkCTL::getItemsSorted() {
+  std::set<std::string> targets;
+  std::vector<UnitItem *> units;
+
+  if (items.empty()) {
+    fetch();
+  }
+
+  for (const auto unit : items) {
+    targets.insert((*unit).target);
+  }
+
+  for (std::string target : targets) {
+    auto targetedUnits = getByTarget(target.c_str());
+    units.insert(units.end(), targetedUnits.begin(), targetedUnits.end());
+  }
+
+  return units;
+}

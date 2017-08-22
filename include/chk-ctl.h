@@ -13,8 +13,10 @@ class ChkCTL {
   public:
     ChkCTL();
     ~ChkCTL();
+    std::vector<UnitItem *> getItemsSorted();
     std::vector<UnitItem *> getByTarget(const char *target);
     std::vector<UnitItem *> getItems();
+    void updateItems();
   private:
     ChkBus *bus;
     std::vector<UnitItem *> items;

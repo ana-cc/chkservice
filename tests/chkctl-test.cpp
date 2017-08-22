@@ -42,3 +42,28 @@ TEST_CASE("should fetch units and prepare", "[ChkCTL]") {
 
   delete ctl;
 }
+
+TEST_CASE("should fetch items sorted by target", "[ChkCTL]") {
+  ChkCTL *ctl = new ChkCTL();
+
+  vector<UnitItem *> units = ctl->getItemsSorted();
+  string lastTarget;
+  int targetChanged = 0;
+
+  std::set<std::string> targets;
+
+  for (const auto unit : units) {
+    targets.insert((*unit).target);
+  }
+
+  for (auto unit : units) {
+    if (unit->target.compare(lastTarget) != 0) {
+      lastTarget = unit->target;
+      targetChanged++;
+    }
+  }
+
+  REQUIRE(targetChanged <= targets.size());
+
+  delete ctl;
+}
