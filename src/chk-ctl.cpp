@@ -82,7 +82,7 @@ std::vector<UnitItem *> ChkCTL::getItemsSorted() {
   }
 
   for (const auto unit : items) {
-    targets.insert((*unit).target);
+    targets.insert(unit->target);
   }
 
   for (std::string target : targets) {

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <set>
 
 #include "chk-systemd.h"
 
@@ -205,7 +206,7 @@ void ChkBus::reloadDaemon() {
     }
 }
 
-void ChkBus::callUnit(const char *method, const char *name, bool force) {
+void ChkBus::callUnit(const char *method, char **names, bool force) {
   int status;
 
   sd_bus_error error = SD_BUS_ERROR_NULL;
@@ -215,8 +216,6 @@ void ChkBus::callUnit(const char *method, const char *name, bool force) {
     connect();
   }
 
-  char *names[2] = { (char *) name , NULL };
-
   status = sd_bus_message_new_method_call(
     bus,
     &busMessage,
@@ -224,7 +223,6 @@ void ChkBus::callUnit(const char *method, const char *name, bool force) {
     "/org/freedesktop/systemd1",
     "org.freedesktop.systemd1.Manager",
     method);
-
 
   if (status < 0) {
     setErrorMessage(error.message);
@@ -256,6 +254,7 @@ void ChkBus::callUnit(const char *method, const char *name, bool force) {
     goto finish;
   }
 
+  std::cout << method << "ll is ok..." << std::endl;
   finish:
     sd_bus_error_free(&error);
     sd_bus_message_unref(busMessage);
@@ -266,9 +265,37 @@ void ChkBus::callUnit(const char *method, const char *name, bool force) {
     }
 }
 
+void ChkBus::enableUnits(std::set<std::string> *ids) {
+  int i = 0;
+  char *names[ids->size()];
+
+  for (auto id : (*ids)) {
+    names[i] = (char *) id.c_str();
+    i++;
+  }
+  names[i] = NULL;
+
+  callUnit("EnableUnitFiles", names, true);
+}
+
+void ChkBus::disableUnits(std::set<std::string> *ids) {
+  int i = 0;
+  char *names[ids->size()];
+
+  for (auto id : (*ids)) {
+    names[i] = (char *) id.c_str();
+    i++;
+  }
+  names[i] = NULL;
+
+  callUnit("DisableUnitFiles", names, false);
+}
+
 void ChkBus::enableUnit(const char *name) {
   try {
-    callUnit("EnableUnitFiles", name, true);
+    std::set<std::string> id;
+    id.insert(name);
+    enableUnits(&id);
   } catch (std::string &err) {
     throw err;
   }
@@ -276,7 +303,9 @@ void ChkBus::enableUnit(const char *name) {
 
 void ChkBus::disableUnit(const char *name) {
   try {
-    callUnit("DisableUnitFiles", name, false);
+    std::set<std::string> id;
+    id.insert(name);
+    disableUnits(&id);
   } catch (std::string &err) {
     throw err;
   }

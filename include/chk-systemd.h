@@ -2,6 +2,7 @@
 #define _CHK_SYSTEMD_H
 
 #include <iostream>
+#include <set>
 #include <vector>
 #include <systemd/sd-bus.h>
 
@@ -37,6 +38,8 @@ class ChkBus {
 
     void disableUnit(const char *name);
     void enableUnit(const char *name);
+    void disableUnits(std::set<std::string> *ids);
+    void enableUnits(std::set<std::string> *ids);
 
     void reloadDaemon();
 
@@ -44,7 +47,7 @@ class ChkBus {
     sd_bus* bus = NULL;
     std::string errorMessage;
     const char* getState(const char *name);
-    void callUnit(const char *method, const char *name, bool force);
+    void callUnit(const char *method, char **names, bool force);
 };
 
 int busParseUnit(sd_bus_message *message, UnitInfo *u);

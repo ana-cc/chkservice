@@ -53,12 +53,10 @@ TEST_CASE("should get list of units", "[ChkBus]") {
 
 TEST_CASE("should be able disable/enable unit", "[ChkBus]") {
   ChkBus *bus = new ChkBus();
-  ChkBus *tmp = new ChkBus();
 
-  REQUIRE_NOTHROW(bus->connect());
+  REQUIRE_NOTHROW(bus->disableUnit("ssh.service"));
   REQUIRE_NOTHROW(bus->enableUnit("ssh.service"));
   REQUIRE_NOTHROW(bus->reloadDaemon());
-  REQUIRE_NOTHROW(bus->disableUnit("ssh.service"));
 
   delete bus;
 }
