@@ -254,6 +254,35 @@ std::vector<UnitInfo> ChkBus::getUnits() {
   return units;
 }
 
+std::vector<UnitInfo> ChkBus::getAllUnits() {
+  std::vector<UnitInfo> files = getUnitFiles();
+  std::vector<UnitInfo> units = getUnits();
+
+  for (auto unit : units) {
+    int idx = 0;
+    for (auto file : files) {
+      std::string uid(unit.id);
+      std::string fid(file.id);
+
+      if (uid.find(fid) == 0) {
+        files[idx].description = strdup(unit.description);
+        files[idx].loadState = strdup(unit.loadState);
+        files[idx].activeState = strdup(unit.activeState);
+        files[idx].subState = strdup(unit.subState);
+        files[idx].following = strdup(unit.following);
+        files[idx].jobId = unit.jobId;
+        files[idx].jobType = strdup(unit.jobType);
+        files[idx].jobPath = strdup(unit.jobPath);
+      }
+      idx++;
+    }
+  }
+
+  units.clear();
+
+  return files;
+}
+
 void ChkBus::reloadDaemon() {
   int status;
 

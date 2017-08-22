@@ -19,17 +19,3 @@ int busParseUnit(sd_bus_message *message, UnitInfo *u) {
     &u->jobType,
     &u->jobPath);
 }
-
-std::string *ch2str(char *s) {
-  std::string *p = new std::string();
-  int psize = 0;
-
-  while(*s != '\0') {
-    p->insert(psize, sizeof(char), *s++);
-    psize++;
-  }
-
-  p->insert(psize, sizeof(char), '\0');
-
-  return p;
-}

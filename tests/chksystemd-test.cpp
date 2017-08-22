@@ -70,6 +70,18 @@ TEST_CASE("should get list of units", "[ChkBus]") {
   delete bus;
 }
 
+TEST_CASE("should get all units", "[ChkBus]") {
+  ChkBus *bus = new ChkBus();
+
+  auto units = bus->getAllUnits();
+
+  for (auto unit : units) {
+    cout << unit.id << " " << (unit.description ? unit.description : "") << endl;
+  }
+
+  delete bus;
+}
+
 TEST_CASE("should be able enable/disable unit", "[ChkBus]") {
   ChkBus *bus = new ChkBus();
 
