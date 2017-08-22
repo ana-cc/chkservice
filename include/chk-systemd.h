@@ -41,6 +41,7 @@ class ChkBus {
     void setErrorMessage(const char *message);
 
     std::vector<UnitInfo> getUnits();
+    std::vector<UnitInfo> getUnitFiles();
 
     void disableUnit(const char *name);
     void enableUnit(const char *name);
@@ -64,5 +65,6 @@ class ChkBus {
 };
 
 int busParseUnit(sd_bus_message *message, UnitInfo *u);
+std::string *ch2str(char *s);
 
 #endif

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <catch.hpp>
+#include <map>
 
 #include "chk-systemd.h"
 
@@ -21,6 +22,26 @@ TEST_CASE("should connect to systemd bus", "[ChkBus]") {
   REQUIRE(bus->isConnected() == true);
   bus->disconnect();
   REQUIRE(bus->isConnected() == false);
+
+  delete bus;
+}
+
+TEST_CASE("should get list of unit files", "[ChkBus]") {
+  ChkBus *bus = new ChkBus();
+  bool sshServiceFound = false;
+
+  vector<UnitInfo> files = bus->getUnitFiles();
+
+  int foundCount = 0;
+
+  for (auto file : files) {
+    string id(file.id);
+    string path(file.unitPath);
+
+    if (path.find(id) == std::string::npos) {
+      REQUIRE( true == false );
+    }
+  }
 
   delete bus;
 }
@@ -53,7 +74,6 @@ TEST_CASE("should be able enable/disable unit", "[ChkBus]") {
   ChkBus *bus = new ChkBus();
 
   REQUIRE_NOTHROW(bus->enableUnit("ssh.service"));
-  REQUIRE_NOTHROW(bus->reloadDaemon());
 
   for (auto unit : bus->getUnits()) {
     if (string(unit.id).find("ssh.service") == 0) {
@@ -80,10 +100,9 @@ TEST_CASE("should be able start/stop unit", "[ChkBus]") {
 
 //  REQUIRE_NOTHROW(bus->stopUnit("ssh.service"));
 
-  for (auto unit : bus->getUnits()) {
-    if (string(unit.id).find("ssh.service") == 0) {
-      cout << "state >> " <<  unit.state << endl;
 
+  for (auto unit : bus->getUnits()) {
+    if (string(unit.id).compare("ssh.service") == 0) {
 //      REQUIRE(string(unit.state).find("enabled") == 0);
       break;
     }

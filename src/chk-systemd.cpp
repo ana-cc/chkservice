@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
-#include <set>
 
 #include "chk-systemd.h"
 
@@ -63,6 +62,8 @@ const char *ChkBus::getState(const char *name) {
   int status;
   const char *state;
 
+  errorMessage.clear();
+
   if (!isConnected()) {
     connect();
   }
@@ -101,6 +102,84 @@ const char *ChkBus::getState(const char *name) {
     }
 
   return status < 0 ? NULL : strdup(state);
+}
+
+std::vector<UnitInfo> ChkBus::getUnitFiles() {
+  int status;
+  const char *state;
+  char *path;
+  std::vector<UnitInfo> units;
+
+  sd_bus_message* busMessage = NULL;
+  sd_bus_message* reply = NULL;
+  sd_bus_error error = SD_BUS_ERROR_NULL;
+
+  errorMessage.clear();
+
+  if (!isConnected()) {
+    connect();
+  }
+
+  status = sd_bus_message_new_method_call(
+    bus,
+    &busMessage,
+    "org.freedesktop.systemd1",
+    "/org/freedesktop/systemd1",
+    "org.freedesktop.systemd1.Manager",
+    "ListUnitFiles");
+
+  if (status < 0) {
+    setErrorMessage(status);
+    goto finish;
+  }
+
+  status = sd_bus_call(bus, busMessage, 0, &error, &reply);
+
+  if (status < 0) {
+    setErrorMessage(error.message);
+    goto finish;
+  }
+
+  status = sd_bus_message_enter_container(reply, SD_BUS_TYPE_ARRAY, "(ss)");
+
+  if (status < 0) {
+    setErrorMessage(status);
+    goto finish;
+  }
+
+  while ((status = sd_bus_message_read(reply, "(ss)", &path, &state)) > 0) {
+    UnitInfo *unit = new UnitInfo();
+
+    unit->unitPath = strdup(path);
+    unit->state = strdup(state);
+
+    std::string p = std::string(unit->unitPath);
+    unit->id = strdup(p.substr(p.find_last_of("/") + 1, p.length()).c_str());
+
+    units.push_back((*unit));
+  }
+
+  status = sd_bus_message_exit_container(reply);
+
+  if (status < 0) {
+    setErrorMessage(status);
+    goto finish;
+  }
+
+  finish:
+    sd_bus_error_free(&error);
+    sd_bus_message_unref(busMessage);
+    sd_bus_message_unref(reply);
+    disconnect();
+
+    if (status < 0) {
+      throw std::string(errorMessage);
+    }
+
+  for (std::vector<UnitInfo>::iterator iter = units.begin(); iter != units.end(); iter++) {
+  }
+
+  return units;
 }
 
 std::vector<UnitInfo> ChkBus::getUnits() {
@@ -165,6 +244,7 @@ std::vector<UnitInfo> ChkBus::getUnits() {
   finish:
     sd_bus_error_free(&error);
     sd_bus_message_unref(busMessage);
+    sd_bus_message_unref(reply);
     disconnect();
 
     if (status < 0) {
