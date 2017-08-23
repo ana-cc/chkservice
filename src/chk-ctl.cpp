@@ -6,6 +6,7 @@
 
 ChkCTL::ChkCTL() {
   bus = new ChkBus();
+  items.clear();
 }
 
 ChkCTL::~ChkCTL() {
@@ -48,9 +49,15 @@ std::vector<UnitItem *> ChkCTL::getByTarget(const char *target) {
 void ChkCTL::fetch() {
   std::vector<UnitInfo> sysUnits = bus->getAllUnits();
 
+  items.clear();
+
   for (const auto unit : sysUnits) {
-    pushItem(unit);
+    if (unit.id) {
+      pushItem(unit);
+    }
   }
+
+  sysUnits.clear();
 }
 
 void ChkCTL::sortByName(std::vector<UnitItem *> *sortable) {
@@ -62,32 +69,67 @@ void ChkCTL::sortByName(std::vector<UnitItem *> *sortable) {
 void ChkCTL::pushItem(UnitInfo unit) {
   UnitItem *item = new UnitItem();
 
-  std::string id = unit.id;
+  std::string id(strdup(unit.id));
 
   item->id = id;
   item->name = id.substr(0, id.find_last_of('.'));
   item->target = id.substr(id.find_last_of('.') + 1, id.length());
-  item->sysUnit = unit;
 
+  if (unit.state != NULL) {
+    std::string state(unit.state);
+
+    if (state.find("enabled") == 0) {
+      item->enabled = true;
+    }
+  } else {
+    item->enabled = false;
+  }
+
+  free((void *) unit.state);
   items.push_back(item);
 };
 
 std::vector<UnitItem *> ChkCTL::getItemsSorted() {
-  std::set<std::string> targets;
-  std::vector<UnitItem *> units;
-
   if (items.empty()) {
     fetch();
   }
 
+  std::set<std::string> targets;
+  std::vector<std::string> orderedTargets;
+  std::vector<UnitItem *> sunits;
+
   for (const auto unit : items) {
-    targets.insert(unit->target);
+    if (unit->target.compare("service") != 0 &&
+        unit->target.compare("timer") != 0 &&
+        unit->target.compare("socket") != 0) {
+
+      targets.insert(unit->target);
+    }
   }
 
-  for (std::string target : targets) {
+  orderedTargets.push_back("service");
+  orderedTargets.push_back("timer");
+  orderedTargets.push_back("socket");
+
+  for (const auto target : targets) {
+    orderedTargets.push_back(target);
+  }
+
+  bool isFirst = false;
+
+  for (std::string target : orderedTargets) {
     auto targetedUnits = getByTarget(target.c_str());
-    units.insert(units.end(), targetedUnits.begin(), targetedUnits.end());
+    sortByName(&targetedUnits);
+
+    if (isFirst) {
+      UnitItem *separator = new UnitItem();
+      separator->target = std::string(target);
+
+      sunits.push_back(separator);
+    }
+    sunits.insert(sunits.end(), targetedUnits.begin(), targetedUnits.end());
+    isFirst = true;
   }
 
-  return units;
+  return sunits;
 }

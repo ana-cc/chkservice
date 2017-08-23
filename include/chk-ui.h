@@ -31,9 +31,12 @@ class MainWindow {
     void movePageUp();
     void movePageDown();
     void drawUnits();
+    void drawItem(UnitItem *unit, int y);
 };
 
 void startCurses();
 void stopCurses();
+void printInMiddle(WINDOW *win, int starty, int startx, int width,
+    char *string, chtype color, char *sp);
 
 #endif

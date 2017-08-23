@@ -4,10 +4,11 @@
 #include "chk-systemd.h"
 
 typedef struct UnitItem {
-  UnitInfo sysUnit;
+  UnitInfo *sysUnit;
   std::string id;
   std::string name;
   std::string target;
+  bool enabled;
 } UnitItem;
 
 class ChkCTL {

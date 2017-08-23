@@ -22,6 +22,17 @@ TEST_CASE("should return sorted items", "[ChkCTL]") {
   delete ctl;
 }
 
+TEST_CASE("should get system units against saved items ", "[ChkCTL]") {
+  ChkCTL *ctl = new ChkCTL();
+
+  auto units = ctl->getItems();
+  auto items = ctl->getItemsSorted();
+
+//  REQUIRE(units.size() == items.size());
+
+  delete ctl;
+}
+
 TEST_CASE("should fetch units and prepare", "[ChkCTL]") {
   ChkCTL *ctl = new ChkCTL();
   bool filtered = true;
