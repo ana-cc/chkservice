@@ -153,7 +153,7 @@ std::vector<UnitInfo> ChkBus::getUnitFiles() {
     unit->unitPath = strdup(path);
     unit->state = strdup(state);
 
-    std::string p = std::string(unit->unitPath);
+    std::string p = std::string(strdup(unit->unitPath));
     unit->id = strdup(p.substr(p.find_last_of("/") + 1, p.length()).c_str());
 
     units.push_back((*unit));

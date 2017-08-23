@@ -63,7 +63,7 @@ void MainWindow::createMenu() {
 }
 
 void MainWindow::resize() {
-  screenSize->x = 0;
+  screenSize->x = 2;
   screenSize->y = 0;
   getmaxyx(stdscr, screenSize->h, screenSize->w);
 }
@@ -130,9 +130,9 @@ void MainWindow::drawUnits() {
     units = ctl->getItemsSorted();
   }
 
-//  wclear(win);
   box(win, 0, 0);
   getmaxyx(win, winSize->h, winSize->w);
+  winSize->h -= 2;
 
   std::string title;
   title += "chkservice t/";
@@ -149,7 +149,7 @@ void MainWindow::drawUnits() {
       wattron(win, A_REVERSE);
     }
 
-    drawItem(units[start + i], i + 1);
+    drawItem(units[start + i], i + screenSize->x);
     wattroff(win, A_REVERSE);
   }
 
@@ -182,12 +182,18 @@ void MainWindow::drawItem(UnitItem *unit, int y) {
 
   if (isEditable(unit)) {
     if (unit->enabled) {
-      mvwprintw(win, y, 2, "[x] ");
+      wattron(win, COLOR_PAIR(2));
+      mvwprintw(win, y, 2, "[x]");
+      wattroff(win, COLOR_PAIR(2));
     } else {
-      mvwprintw(win, y, 2, "[ ] ");
+      wattron(win, COLOR_PAIR(5));
+      mvwprintw(win, y, 2, "[ ]");
+      wattroff(win, COLOR_PAIR(5));
     }
   } else {
-    mvwprintw(win, y, 2, " -   ");
+    wattron(win, COLOR_PAIR(5));
+    mvwprintw(win, y, 2, "-");
+    wattroff(win, COLOR_PAIR(5));
   }
 
   mvwprintw(win, y, 10, "%s", unit->id.c_str());

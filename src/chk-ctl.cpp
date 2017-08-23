@@ -46,6 +46,7 @@ std::vector<UnitItem *> ChkCTL::getByTarget(const char *target) {
   return found;
 }
 
+#include <curses.h>
 void ChkCTL::fetch() {
   std::vector<UnitInfo> sysUnits = bus->getAllUnits();
 
