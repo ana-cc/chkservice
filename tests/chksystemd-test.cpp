@@ -54,7 +54,7 @@ TEST_CASE("should get list of units", "[ChkBus]") {
 
   vector<UnitInfo> units;
 
-  REQUIRE_NOTHROW((units = bus->getUnits()));
+  REQUIRE_NOTHROW((units = bus->getAllUnits()));
   REQUIRE(typeid(units[0]) == typeid(UnitInfo));
   REQUIRE(typeid(units[0].id) == typeid(const char *));
   REQUIRE(string(units[0].id).length() > 0);
@@ -73,11 +73,13 @@ TEST_CASE("should get list of units", "[ChkBus]") {
 TEST_CASE("should get all units", "[ChkBus]") {
   ChkBus *bus = new ChkBus();
 
-  auto units = bus->getAllUnits();
+  auto allUnits = bus->getAllUnits();
+  auto units = bus->getUnits();
 
-  for (auto unit : units) {
-    cout << unit.id << " " << (unit.description ? unit.description : "") << endl;
-  }
+  REQUIRE(allUnits.size() > units.size());
+
+  allUnits.clear();
+  units.clear();
 
   delete bus;
 }
@@ -87,7 +89,7 @@ TEST_CASE("should be able enable/disable unit", "[ChkBus]") {
 
   REQUIRE_NOTHROW(bus->enableUnit("ssh.service"));
 
-  for (auto unit : bus->getUnits()) {
+  for (auto unit : bus->getAllUnits()) {
     if (string(unit.id).find("ssh.service") == 0) {
       REQUIRE(string(unit.state).find("enabled") == 0);
       break;
@@ -97,7 +99,7 @@ TEST_CASE("should be able enable/disable unit", "[ChkBus]") {
   REQUIRE_NOTHROW(bus->disableUnit("ssh.service"));
   REQUIRE_NOTHROW(bus->reloadDaemon());
 
-  for (auto unit : bus->getUnits()) {
+  for (auto unit : bus->getAllUnits()) {
     if (string(unit.id).find("ssh.service") == 0) {
       REQUIRE(string(unit.state).find("disabled") == 0);
       break;
@@ -110,12 +112,20 @@ TEST_CASE("should be able enable/disable unit", "[ChkBus]") {
 TEST_CASE("should be able start/stop unit", "[ChkBus]") {
   ChkBus *bus = new ChkBus();
 
-//  REQUIRE_NOTHROW(bus->stopUnit("ssh.service"));
+  REQUIRE_NOTHROW(bus->stopUnit("ssh.service"));
 
-
-  for (auto unit : bus->getUnits()) {
+  for (auto unit : bus->getAllUnits()) {
     if (string(unit.id).compare("ssh.service") == 0) {
-//      REQUIRE(string(unit.state).find("enabled") == 0);
+      REQUIRE(unit.loadState == NULL);
+      break;
+    }
+  }
+
+  REQUIRE_NOTHROW(bus->startUnit("ssh.service"));
+
+  for (auto unit : bus->getAllUnits()) {
+    if (string(unit.id).compare("ssh.service") == 0) {
+      REQUIRE(unit.loadState != NULL);
       break;
     }
   }

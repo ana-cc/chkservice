@@ -260,6 +260,7 @@ std::vector<UnitInfo> ChkBus::getAllUnits() {
 
   for (auto unit : units) {
     int idx = 0;
+    bool found = false;
     for (auto file : files) {
       std::string uid(unit.id);
       std::string fid(file.id);
@@ -273,8 +274,13 @@ std::vector<UnitInfo> ChkBus::getAllUnits() {
         files[idx].jobId = unit.jobId;
         files[idx].jobType = strdup(unit.jobType);
         files[idx].jobPath = strdup(unit.jobPath);
+        found = true;
       }
       idx++;
+    }
+
+    if (!found) {
+      files.push_back(unit);
     }
   }
 
