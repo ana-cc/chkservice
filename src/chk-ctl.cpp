@@ -46,13 +46,11 @@ std::vector<UnitItem *> ChkCTL::getByTarget(const char *target) {
 }
 
 void ChkCTL::fetch() {
-  std::vector<UnitInfo> sysUnits = bus->getUnits();
+  std::vector<UnitInfo> sysUnits = bus->getAllUnits();
 
   for (const auto unit : sysUnits) {
     pushItem(unit);
   }
-
-  sortByName(&items);
 }
 
 void ChkCTL::sortByName(std::vector<UnitItem *> *sortable) {
@@ -62,10 +60,11 @@ void ChkCTL::sortByName(std::vector<UnitItem *> *sortable) {
 }
 
 void ChkCTL::pushItem(UnitInfo unit) {
-  UnitItem *item = new UnitItem;
+  UnitItem *item = new UnitItem();
 
   std::string id = unit.id;
 
+  item->id = id;
   item->name = id.substr(0, id.find_last_of('.'));
   item->target = id.substr(id.find_last_of('.') + 1, id.length());
   item->sysUnit = unit;

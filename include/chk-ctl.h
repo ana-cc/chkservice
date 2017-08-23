@@ -5,6 +5,7 @@
 
 typedef struct UnitItem {
   UnitInfo sysUnit;
+  std::string id;
   std::string name;
   std::string target;
 } UnitItem;

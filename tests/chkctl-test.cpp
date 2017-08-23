@@ -63,7 +63,7 @@ TEST_CASE("should fetch items sorted by target", "[ChkCTL]") {
     }
   }
 
-  REQUIRE(targetChanged <= targets.size());
+  REQUIRE(targetChanged == targets.size());
 
   delete ctl;
 }
