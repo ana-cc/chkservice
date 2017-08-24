@@ -62,7 +62,16 @@ void ChkCTL::fetch() {
 
 void ChkCTL::sortByName(std::vector<UnitItem *> *sortable) {
   std::sort(sortable->begin(), sortable->end(), [](const UnitItem *a, const UnitItem *b) {
-    return std::tolower(a->id[0]) < std::tolower(b->id[0]);
+    const char* s1 = a->id.c_str();
+    const char* s2 = b->id.c_str();
+    while(true) {
+       if ( std::toupper(*s1) < std::toupper(*s2) ) return true;
+       if ( std::toupper(*s1) > std::toupper(*s2) ) return false;
+       if ( *s1 == 0 && *s2 == 0 ) return false;
+       if ( *s1 > *s2) return false;
+       if ( *s1 < *s2) return true;
+       ++s1; ++s2;
+    }
   });
 }
 
@@ -73,9 +82,12 @@ void ChkCTL::pushItem(UnitInfo unit) {
 
   item->id = id;
   item->target = id.substr(id.find_last_of('.') + 1, id.length());
+  item->description = std::string((unit.description == NULL ?
+      strdup(unit.unitPath) : strdup(unit.description)));
 
   if (unit.state != NULL) {
     std::string state(unit.state);
+    std::string sub(unit.subState == NULL ? "" : unit.subState);
 
     if (state.find("enabled") == 0) {
       item->state = UNIT_STATE_ENABLED;
@@ -88,6 +100,17 @@ void ChkCTL::pushItem(UnitInfo unit) {
     } else {
       item->state = UNIT_STATE_MASKED;
     }
+
+    if (!sub.empty()) {
+      if (sub.find("running") == 0) {
+        item->sub = UNIT_SUBSTATE_RUNNING;
+      } else {
+        item->state = UNIT_SUBSTATE_CONNECTED;
+      }
+    } else {
+        item->sub = UNIT_SUBSTATE_INVALID;
+    }
+
   } else {
     item->state = UNIT_STATE_MASKED;
   }

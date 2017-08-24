@@ -134,11 +134,11 @@ void MainWindow::drawUnits() {
   getmaxyx(win, winSize->h, winSize->w);
   winSize->h -= 2;
 
-  std::string title;
-  title += "chkservice t/";
-  title += units.size();
-
-  printInMiddle(win, 0, 2, winSize->w - 4, (char *)title.c_str(), COLOR_PAIR(4), (char *)NULL);
+//  std::string title;
+//  title += "chkservice t/";
+//  title += units.size();
+//
+//  printInMiddle(win, 0, 2, winSize->w - 4, (char *)title.c_str(), COLOR_PAIR(4), (char *)NULL);
 
   for (int i = 0; i < (winSize->h - 2); i++) {
     if ((i + start) > (int)units.size() - 1) {
@@ -170,35 +170,39 @@ void MainWindow::drawItem(UnitItem *unit, int y) {
     return;
   }
 
-  if (unit->id.size() > (unsigned int)(winSize->w - 20)) {
-    unit->id.resize(winSize->w - 20);
+  if (unit->id.size() > (unsigned int)(winSize->w - 16)) {
+    unit->id.resize(winSize->w - 16);
   }
 
-  if (unit->state != 100) {
-    if (unit->state == UNIT_STATE_ENABLED) {
-      wattron(win, COLOR_PAIR(2));
-      mvwprintw(win, y, 2, "[x]");
-      wattroff(win, COLOR_PAIR(2));
-    } else if (unit->state == UNIT_STATE_DISABLED) {
-      wattron(win, COLOR_PAIR(5));
-      mvwprintw(win, y, 2, "[ ]");
-      wattroff(win, COLOR_PAIR(5));
-    } else if (unit->state == UNIT_STATE_STATIC) {
-      wattron(win, COLOR_PAIR(5));
-      mvwprintw(win, y, 2, "[s]");
-      wattroff(win, COLOR_PAIR(5));
-    } else if (unit->state == UNIT_STATE_BAD) {
-      wattron(win, COLOR_PAIR(1));
-      mvwprintw(win, y, 2, "-b-");
-      wattroff(win, COLOR_PAIR(1));
-    } else if (unit->state == UNIT_STATE_MASKED) {
-      wattron(win, COLOR_PAIR(3));
-      mvwprintw(win, y, 2, "-m-");
-      wattroff(win, COLOR_PAIR(3));
-    }
-  } else {
+  if (unit->state == UNIT_STATE_ENABLED) {
+    wattron(win, COLOR_PAIR(2));
+    mvwprintw(win, y, 2, "[x]");
+    wattroff(win, COLOR_PAIR(2));
+  } else if (unit->state == UNIT_STATE_DISABLED) {
     wattron(win, COLOR_PAIR(5));
-    mvwprintw(win, y, 2, " -");
+    mvwprintw(win, y, 2, "[ ]");
+    wattroff(win, COLOR_PAIR(5));
+  } else if (unit->state == UNIT_STATE_STATIC) {
+    wattron(win, COLOR_PAIR(5));
+    mvwprintw(win, y, 2, "[s]");
+    wattroff(win, COLOR_PAIR(5));
+  } else if (unit->state == UNIT_STATE_BAD) {
+    wattron(win, COLOR_PAIR(1));
+    mvwprintw(win, y, 2, "-b-");
+    wattroff(win, COLOR_PAIR(1));
+  } else if (unit->state == UNIT_STATE_MASKED) {
+    wattron(win, COLOR_PAIR(3));
+    mvwprintw(win, y, 2, "-m-");
+    wattroff(win, COLOR_PAIR(3));
+  }
+
+  if (unit->sub == UNIT_SUBSTATE_RUNNING) {
+    wattron(win, COLOR_PAIR(5));
+    mvwprintw(win, y, 7, ">");
+    wattroff(win, COLOR_PAIR(5));
+  } else if (unit->state == UNIT_SUBSTATE_CONNECTED) {
+    wattron(win, COLOR_PAIR(5));
+    mvwprintw(win, y, 7, "=");
     wattroff(win, COLOR_PAIR(5));
   }
 

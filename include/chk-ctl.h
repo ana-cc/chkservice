@@ -7,6 +7,8 @@ typedef struct UnitItem {
   UnitInfo *sysUnit;
   std::string id;
   std::string target;
+  std::string description;
+  int sub;
   int state;
 } UnitItem;
 
@@ -16,6 +18,12 @@ enum {
   UNIT_STATE_STATIC,
   UNIT_STATE_BAD,
   UNIT_STATE_MASKED
+};
+
+enum {
+  UNIT_SUBSTATE_RUNNING,
+  UNIT_SUBSTATE_CONNECTED,
+  UNIT_SUBSTATE_INVALID
 };
 
 class ChkCTL {
