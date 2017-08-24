@@ -21,6 +21,7 @@ class MainWindow {
   private:
     RECTANGLE *screenSize = new RECTANGLE();
     RECTANGLE *winSize = new RECTANGLE();
+    RECTANGLE *padding = new RECTANGLE();
     ChkCTL *ctl = new ChkCTL;
     std::vector<UnitItem *> units;
     int selected = 0;
@@ -32,12 +33,16 @@ class MainWindow {
     void movePageDown();
     void drawUnits();
     void drawItem(UnitItem *unit, int y);
-    void drawInfo(UnitItem *unit);
+    void drawInfo();
+    void toggleUnitState();
+    void toggleUnitSubState();
+    void error(char *err);
 };
 
 void startCurses();
 void stopCurses();
 void printInMiddle(WINDOW *win, int starty, int startx, int width,
     char *string, chtype color, char *sp);
+void aboutWindow(RECTANGLE *parent);
 
 #endif

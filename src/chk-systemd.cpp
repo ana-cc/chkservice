@@ -470,7 +470,11 @@ void ChkBus::enableUnits(std::set<std::string> *ids) {
   }
   names[i] = NULL;
 
-  applyUnitState("EnableUnitFiles", names, STATE_FLAGS_ENABLE);
+  try {
+    applyUnitState("EnableUnitFiles", names, STATE_FLAGS_ENABLE);
+  } catch (std::string &err) {
+    throw err;
+  }
 }
 
 void ChkBus::disableUnits(std::set<std::string> *ids) {
@@ -489,7 +493,11 @@ void ChkBus::disableUnits(std::set<std::string> *ids) {
 
   names[i] = NULL;
 
-  applyUnitState("DisableUnitFiles", names, STATE_FLAGS_DISABLE);
+  try {
+    applyUnitState("DisableUnitFiles", names, STATE_FLAGS_DISABLE);
+  } catch (std::string &err) {
+    throw err;
+  }
 }
 
 void ChkBus::enableUnit(const char *name) {
@@ -513,22 +521,38 @@ void ChkBus::disableUnit(const char *name) {
 }
 
 void ChkBus::stopUnits(std::set<std::string> *ids) {
-  for (auto id : (*ids)) {
-    applyUnitSub(id.c_str(), "StopUnit");
+  try {
+    for (auto id : (*ids)) {
+      applyUnitSub(id.c_str(), "StopUnit");
+    }
+  } catch (std::string &err) {
+    throw err;
   }
 }
 
 void ChkBus::startUnits(std::set<std::string> *ids) {
-  for (auto id : (*ids)) {
-    applyUnitSub(id.c_str(), "StartUnit");
+  try {
+    for (auto id : (*ids)) {
+      applyUnitSub(id.c_str(), "StartUnit");
+    }
+  } catch (std::string &err) {
+    throw err;
   }
 }
 
 void ChkBus::stopUnit(const char *name) {
-  applyUnitSub(name, "StopUnit");
+  try {
+    applyUnitSub(name, "StopUnit");
+  } catch (std::string &err) {
+    throw err;
+  }
 }
 
 void ChkBus::startUnit(const char *name) {
-  applyUnitSub(name, "StartUnit");
+  try {
+    applyUnitSub(name, "StartUnit");
+  } catch (std::string &err) {
+    throw err;
+  }
 }
 

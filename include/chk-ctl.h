@@ -33,11 +33,12 @@ class ChkCTL {
     std::vector<UnitItem *> getItemsSorted();
     std::vector<UnitItem *> getByTarget(const char *target);
     std::vector<UnitItem *> getItems();
-    void updateItems();
+    void toggleUnitState(UnitItem *item);
+    void toggleUnitSubState(UnitItem *item);
+    void fetch();
   private:
     ChkBus *bus;
     std::vector<UnitItem *> items;
-    void fetch();
     void pushItem(UnitInfo unit);
     void sortByName(std::vector<UnitItem *> *sortable);
 };

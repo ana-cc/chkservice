@@ -1,4 +1,5 @@
 #include "chk-ui.h"
+#include "chk.h"
 
 void startCurses() {
   initscr();
@@ -47,4 +48,24 @@ void printInMiddle(WINDOW *win, int starty, int startx, int width,
 
   mvwprintw(win, y, x, "%s", string);
   wattroff(win, color);
+}
+
+void aboutWindow(RECTANGLE *parent) {
+  const int winH = 22;
+  const int winW = 60;
+
+  WINDOW *aboutwin = newwin(winH, winW,
+      (parent->h / 2) - (winH / 2),
+      (parent->w / 2) - (winW / 2)
+      );
+
+  wattron(aboutwin, COLOR_PAIR(2));
+  mvwprintw(aboutwin, 0, 0, ABOUT_INFO, VERSION);
+  wattroff(aboutwin, COLOR_PAIR(2));
+  refresh();
+  wrefresh(aboutwin);
+  getch();
+  delwin(aboutwin);
+  clear();
+  refresh();
 }

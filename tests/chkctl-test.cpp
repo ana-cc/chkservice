@@ -13,6 +13,8 @@ TEST_CASE("should create object ctl", "[ChkCTL]") {
 TEST_CASE("should return sorted items", "[ChkCTL]") {
   ChkCTL *ctl = new ChkCTL();
 
+  REQUIRE_NOTHROW(ctl->fetch());
+
   auto units = ctl->getItems();
   REQUIRE(tolower(units[0]->id[0]) < tolower(units[units.size() - 1]->id[0]));
 
@@ -24,17 +26,18 @@ TEST_CASE("should return sorted items", "[ChkCTL]") {
 
 TEST_CASE("should get system units against saved items ", "[ChkCTL]") {
   ChkCTL *ctl = new ChkCTL();
+  ctl->fetch();
 
-  auto units = ctl->getItems();
   auto items = ctl->getItemsSorted();
 
-//  REQUIRE(units.size() == items.size());
+  REQUIRE(items.size() > 0);
 
   delete ctl;
 }
 
 TEST_CASE("should fetch units and prepare", "[ChkCTL]") {
   ChkCTL *ctl = new ChkCTL();
+  ctl->fetch();
   bool filtered = true;
 
   for (auto unit : ctl->getByTarget("service")) {
@@ -56,6 +59,7 @@ TEST_CASE("should fetch units and prepare", "[ChkCTL]") {
 
 TEST_CASE("should fetch items sorted by target", "[ChkCTL]") {
   ChkCTL *ctl = new ChkCTL();
+  ctl->fetch();
 
   vector<UnitItem *> units = ctl->getItemsSorted();
   string lastTarget;
@@ -68,13 +72,13 @@ TEST_CASE("should fetch items sorted by target", "[ChkCTL]") {
   }
 
   for (auto unit : units) {
-    if (unit->target.compare(lastTarget) != 0) {
+    if (unit->id.size() != 0 && unit->target.compare(lastTarget) != 0) {
       lastTarget = unit->target;
       targetChanged++;
     }
   }
 
-  REQUIRE(targetChanged == targets.size());
+  REQUIRE(targetChanged == (targets.size() - 1));
 
   delete ctl;
 }

@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <set>
 
 #include "chk-ctl.h"
 #include "chk-systemd.h"
@@ -14,25 +13,12 @@ ChkCTL::~ChkCTL() {
   items.clear();
 }
 
-void ChkCTL::updateItems() {
-  items.clear();
-  fetch();
-}
-
 std::vector<UnitItem *> ChkCTL::getItems() {
-  if (items.empty()) {
-    fetch();
-  }
-
   sortByName(&items);
   return items;
 }
 
 std::vector<UnitItem *> ChkCTL::getByTarget(const char *target) {
-  if (items.empty()) {
-    fetch();
-  }
-
   std::vector<UnitItem *> found;
   std::string pattern = target == NULL ? "" : target;
 
@@ -42,14 +28,18 @@ std::vector<UnitItem *> ChkCTL::getByTarget(const char *target) {
     }
   }
 
-  sortByName(&found);
   return found;
 }
 
 void ChkCTL::fetch() {
-  std::vector<UnitInfo> sysUnits = bus->getAllUnits();
-
+  std::vector<UnitInfo> sysUnits;
   items.clear();
+
+  try {
+    sysUnits = bus->getAllUnits();
+  } catch (std::string &err) {
+    throw err;
+  }
 
   for (const auto unit : sysUnits) {
     if (unit.id) {
@@ -121,29 +111,25 @@ void ChkCTL::pushItem(UnitInfo unit) {
 };
 
 std::vector<UnitItem *> ChkCTL::getItemsSorted() {
-  if (items.empty()) {
-    fetch();
-  }
-
-  std::set<std::string> targets;
   std::vector<std::string> orderedTargets;
   std::vector<UnitItem *> sunits;
-
-  for (const auto unit : items) {
-    if (unit->target.compare("service") != 0 &&
-        unit->target.compare("timer") != 0 &&
-        unit->target.compare("socket") != 0) {
-
-      targets.insert(unit->target);
-    }
-  }
+  bool alreadyHasTarget = false;
 
   orderedTargets.push_back("service");
   orderedTargets.push_back("timer");
   orderedTargets.push_back("socket");
 
-  for (const auto target : targets) {
-    orderedTargets.push_back(target);
+  for (const auto unit : items) {
+    alreadyHasTarget = false;
+    for (auto t : orderedTargets) {
+      if (t.find(unit->target) == 0) {
+        alreadyHasTarget = true;
+        break;
+      }
+    }
+    if (!alreadyHasTarget) {
+      orderedTargets.push_back(unit->target);
+    }
   }
 
   bool isFirst = false;
@@ -153,14 +139,48 @@ std::vector<UnitItem *> ChkCTL::getItemsSorted() {
     sortByName(&targetedUnits);
 
     if (isFirst) {
+      UnitItem *separatorTitle = new UnitItem();
       UnitItem *separator = new UnitItem();
-      separator->target = std::string(target);
+      separatorTitle->target = target;
 
       sunits.push_back(separator);
+      sunits.push_back(separatorTitle);
+      sunits.push_back(separator);
     }
+
     sunits.insert(sunits.end(), targetedUnits.begin(), targetedUnits.end());
     isFirst = true;
   }
 
   return sunits;
+}
+
+void ChkCTL::toggleUnitState(UnitItem *item) {
+  try {
+    if (item->state == UNIT_STATE_ENABLED ||
+        item->state == UNIT_STATE_STATIC) {
+
+      bus->disableUnit(item->id.c_str());
+      item->state = UNIT_STATE_DISABLED;
+    } else if (item->state == UNIT_STATE_DISABLED) {
+      bus->enableUnit(item->id.c_str());
+      item->state = UNIT_STATE_ENABLED;
+    }
+  } catch (std::string &err) {
+    throw err;
+  }
+}
+
+void ChkCTL::toggleUnitSubState(UnitItem *item) {
+  try {
+    if (item->sub != UNIT_SUBSTATE_RUNNING) {
+      bus->startUnit(item->id.c_str());
+      item->sub = UNIT_SUBSTATE_RUNNING;
+    } else {
+      bus->stopUnit(item->id.c_str());
+      item->sub = UNIT_SUBSTATE_CONNECTED;
+    }
+  } catch (std::string &err) {
+    throw err;
+  }
 }
