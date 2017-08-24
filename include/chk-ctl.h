@@ -6,10 +6,17 @@
 typedef struct UnitItem {
   UnitInfo *sysUnit;
   std::string id;
-  std::string name;
   std::string target;
-  bool enabled;
+  int state;
 } UnitItem;
+
+enum {
+  UNIT_STATE_DISABLED,
+  UNIT_STATE_ENABLED,
+  UNIT_STATE_STATIC,
+  UNIT_STATE_BAD,
+  UNIT_STATE_MASKED
+};
 
 class ChkCTL {
   public:

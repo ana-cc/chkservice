@@ -31,25 +31,25 @@ void MainWindow::createMenu() {
       case 'k':
       case KEY_UP:
         moveUp();
-        if (units[start + selected]->name.size() == 0)
+        if (units[start + selected]->id.size() == 0)
           moveUp();
         break;
       case 'j':
       case KEY_DOWN:
         moveDown();
-        if (units[start + selected]->name.size() == 0)
+        if (units[start + selected]->id.size() == 0)
           moveDown();
         break;
       case 'f':
       case KEY_NPAGE:
         movePageDown();
-        if (units[start + selected]->name.size() == 0)
+        if (units[start + selected]->id.size() == 0)
           moveUp();
         break;
       case 'b':
       case KEY_PPAGE:
         movePageUp();
-        if (units[start + selected]->name.size() == 0)
+        if (units[start + selected]->id.size() == 0)
           moveDown();
         break;
       case 'q':
@@ -130,7 +130,7 @@ void MainWindow::drawUnits() {
     units = ctl->getItemsSorted();
   }
 
-  box(win, 0, 0);
+//  box(win, 0, 0);
   getmaxyx(win, winSize->h, winSize->w);
   winSize->h -= 2;
 
@@ -157,18 +157,12 @@ void MainWindow::drawUnits() {
   wrefresh(win);
 }
 
-bool isEditable(UnitItem *unit) {
-  return (unit->target.compare("service") == 0 ||
-        unit->target.compare("timer") == 0 ||
-        unit->target.compare("socket") == 0);
-}
-
 void MainWindow::drawItem(UnitItem *unit, int y) {
   for (int i = 2; i < (winSize->w - 2); i++) {
     mvwprintw(win, y, i, " ");
   }
 
-  if (unit->name.size() == 0) {
+  if (unit->id.size() == 0) {
     std::string title(unit->target);
     title += "s";
 
@@ -180,19 +174,31 @@ void MainWindow::drawItem(UnitItem *unit, int y) {
     unit->id.resize(winSize->w - 20);
   }
 
-  if (isEditable(unit)) {
-    if (unit->enabled) {
+  if (unit->state != 100) {
+    if (unit->state == UNIT_STATE_ENABLED) {
       wattron(win, COLOR_PAIR(2));
       mvwprintw(win, y, 2, "[x]");
       wattroff(win, COLOR_PAIR(2));
-    } else {
+    } else if (unit->state == UNIT_STATE_DISABLED) {
       wattron(win, COLOR_PAIR(5));
       mvwprintw(win, y, 2, "[ ]");
       wattroff(win, COLOR_PAIR(5));
+    } else if (unit->state == UNIT_STATE_STATIC) {
+      wattron(win, COLOR_PAIR(5));
+      mvwprintw(win, y, 2, "[s]");
+      wattroff(win, COLOR_PAIR(5));
+    } else if (unit->state == UNIT_STATE_BAD) {
+      wattron(win, COLOR_PAIR(1));
+      mvwprintw(win, y, 2, "-b-");
+      wattroff(win, COLOR_PAIR(1));
+    } else if (unit->state == UNIT_STATE_MASKED) {
+      wattron(win, COLOR_PAIR(3));
+      mvwprintw(win, y, 2, "-m-");
+      wattroff(win, COLOR_PAIR(3));
     }
   } else {
     wattron(win, COLOR_PAIR(5));
-    mvwprintw(win, y, 2, "-");
+    mvwprintw(win, y, 2, " -");
     wattroff(win, COLOR_PAIR(5));
   }
 

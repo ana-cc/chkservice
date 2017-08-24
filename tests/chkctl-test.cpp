@@ -14,10 +14,10 @@ TEST_CASE("should return sorted items", "[ChkCTL]") {
   ChkCTL *ctl = new ChkCTL();
 
   auto units = ctl->getItems();
-  REQUIRE(tolower(units[0]->name[0]) < tolower(units[units.size() - 1]->name[0]));
+  REQUIRE(tolower(units[0]->id[0]) < tolower(units[units.size() - 1]->id[0]));
 
   units = ctl->getByTarget("service");
-  REQUIRE(tolower(units[0]->name[0]) < tolower(units[units.size() - 1]->name[0]));
+  REQUIRE(tolower(units[0]->id[0]) < tolower(units[units.size() - 1]->id[0]));
 
   delete ctl;
 }

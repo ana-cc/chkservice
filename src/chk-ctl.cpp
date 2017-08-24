@@ -46,7 +46,6 @@ std::vector<UnitItem *> ChkCTL::getByTarget(const char *target) {
   return found;
 }
 
-#include <curses.h>
 void ChkCTL::fetch() {
   std::vector<UnitInfo> sysUnits = bus->getAllUnits();
 
@@ -63,7 +62,7 @@ void ChkCTL::fetch() {
 
 void ChkCTL::sortByName(std::vector<UnitItem *> *sortable) {
   std::sort(sortable->begin(), sortable->end(), [](const UnitItem *a, const UnitItem *b) {
-    return std::tolower(a->name.c_str()[0]) < std::tolower(b->name.c_str()[0]);
+    return std::tolower(a->id[0]) < std::tolower(b->id[0]);
   });
 }
 
@@ -73,20 +72,28 @@ void ChkCTL::pushItem(UnitInfo unit) {
   std::string id(strdup(unit.id));
 
   item->id = id;
-  item->name = id.substr(0, id.find_last_of('.'));
   item->target = id.substr(id.find_last_of('.') + 1, id.length());
 
   if (unit.state != NULL) {
     std::string state(unit.state);
 
     if (state.find("enabled") == 0) {
-      item->enabled = true;
+      item->state = UNIT_STATE_ENABLED;
+    } else if (state.find("disabled") == 0) {
+      item->state = UNIT_STATE_DISABLED;
+    } else if (state.find("static") == 0) {
+      item->state = UNIT_STATE_STATIC;
+    } else if (state.find("bad") == 0) {
+      item->state = UNIT_STATE_BAD;
+    } else {
+      item->state = UNIT_STATE_MASKED;
     }
   } else {
-    item->enabled = false;
+    item->state = UNIT_STATE_MASKED;
   }
 
   free((void *) unit.state);
+
   items.push_back(item);
 };
 

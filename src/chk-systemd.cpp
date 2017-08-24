@@ -274,6 +274,9 @@ std::vector<UnitInfo> ChkBus::getAllUnits() {
         files[idx].jobId = unit.jobId;
         files[idx].jobType = strdup(unit.jobType);
         files[idx].jobPath = strdup(unit.jobPath);
+        if (unit.state) {
+          files[idx].state = strdup(unit.state);
+        }
         found = true;
       }
       idx++;
