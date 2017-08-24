@@ -36,6 +36,7 @@ class MainWindow {
     void drawInfo();
     void toggleUnitState();
     void toggleUnitSubState();
+    void updateUnits();
     void error(char *err);
 };
 

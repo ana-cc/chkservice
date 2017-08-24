@@ -61,6 +61,11 @@ void MainWindow::createMenu() {
       case 's':
         toggleUnitSubState();
         break;
+      case 'r':
+        updateUnits();
+        drawUnits();
+        error((char *)"Updated..");
+        break;
       case '?':
         aboutWindow(screenSize);
         break;
@@ -147,15 +152,21 @@ void MainWindow::movePageDown() {
   }
 }
 
+void MainWindow::updateUnits() {
+  units.clear();
+
+  try {
+    ctl->fetch();
+    units = ctl->getItemsSorted();
+  } catch(std::string &err) {
+    error((char *)err.c_str());
+    return;
+  }
+}
+
 void MainWindow::drawUnits() {
   if (units.empty()) {
-    try {
-      ctl->fetch();
-      units = ctl->getItemsSorted();
-    } catch(std::string &err) {
-      error((char *)err.c_str());
-      return;
-    }
+    updateUnits();
   }
 
   getmaxyx(win, winSize->h, winSize->w);

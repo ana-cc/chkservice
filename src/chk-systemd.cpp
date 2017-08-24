@@ -255,8 +255,15 @@ std::vector<UnitInfo> ChkBus::getUnits() {
 }
 
 std::vector<UnitInfo> ChkBus::getAllUnits() {
-  std::vector<UnitInfo> files = getUnitFiles();
-  std::vector<UnitInfo> units = getUnits();
+  std::vector<UnitInfo> files;
+  std::vector<UnitInfo> units;
+
+  try {
+    files = getUnitFiles();
+    units = getUnits();
+  } catch(std::string &err) {
+    throw err;
+  }
 
   for (auto unit : units) {
     int idx = 0;
@@ -402,18 +409,22 @@ void ChkBus::applyUnitState(const char *method, char **names, int flags) {
 }
 
 void ChkBus::checkDisabledStatus(char **names) {
-  for (int i = 0; names[i] != NULL; i++) {
-    const char *name = names[i];
-    const char *state = getState(name);
+  try {
+    for (int i = 0; names[i] != NULL; i++) {
+      const char *name = names[i];
+      const char *state = getState(name);
 
-    if (std::string(state).find("enabled") == 0) {
-      applyUnitState("DisableUnitFiles", names, STATE_FLAGS_DISABLE_ISO);
-      applyUnitState("DisableUnitFiles", names, STATE_FLAGS_DISABLE);
-    }
+      if (std::string(state).find("enabled") == 0) {
+        applyUnitState("DisableUnitFiles", names, STATE_FLAGS_DISABLE_ISO);
+        applyUnitState("DisableUnitFiles", names, STATE_FLAGS_DISABLE);
+      }
 
-    if (state != NULL) {
-      free((void *)state);
+      if (state != NULL) {
+        free((void *)state);
+      }
     }
+  } catch(std::string &err) {
+    throw err;
   }
 }
 
@@ -555,4 +566,3 @@ void ChkBus::startUnit(const char *name) {
     throw err;
   }
 }
-
