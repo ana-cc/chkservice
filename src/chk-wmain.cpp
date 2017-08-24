@@ -2,6 +2,8 @@
 #include <iostream>
 #include <csignal>
 #include <cstring>
+#include <sstream>
+#include <iomanip>
 
 MainWindow::MainWindow() {
   resize();
@@ -130,26 +132,22 @@ void MainWindow::drawUnits() {
     units = ctl->getItemsSorted();
   }
 
-//  box(win, 0, 0);
   getmaxyx(win, winSize->h, winSize->w);
   winSize->h -= 2;
-
-//  std::string title;
-//  title += "chkservice t/";
-//  title += units.size();
-//
-//  printInMiddle(win, 0, 2, winSize->w - 4, (char *)title.c_str(), COLOR_PAIR(4), (char *)NULL);
 
   for (int i = 0; i < (winSize->h - 2); i++) {
     if ((i + start) > (int)units.size() - 1) {
       break;
     }
 
+    UnitItem *unit = units[start + i];
+
     if (i == selected) {
+      drawInfo(unit);
       wattron(win, A_REVERSE);
     }
 
-    drawItem(units[start + i], i + screenSize->x);
+    drawItem(unit, i + screenSize->x);
     wattroff(win, A_REVERSE);
   }
 
@@ -158,53 +156,76 @@ void MainWindow::drawUnits() {
 }
 
 void MainWindow::drawItem(UnitItem *unit, int y) {
-  for (int i = 2; i < (winSize->w - 2); i++) {
-    mvwprintw(win, y, i, " ");
-  }
-
   if (unit->id.size() == 0) {
     std::string title(unit->target);
     title += "s";
 
-    printInMiddle(win, y, 4, winSize->w - 4, (char *)title.c_str(), COLOR_PAIR(3), (char *)'~');
+    printInMiddle(win, y, 2, winSize->w - 2, (char *)title.c_str(), COLOR_PAIR(3), (char *)'~');
     return;
-  }
-
-  if (unit->id.size() > (unsigned int)(winSize->w - 16)) {
-    unit->id.resize(winSize->w - 16);
   }
 
   if (unit->state == UNIT_STATE_ENABLED) {
     wattron(win, COLOR_PAIR(2));
-    mvwprintw(win, y, 2, "[x]");
+    mvwprintw(win, y, 1, " [x] ");
     wattroff(win, COLOR_PAIR(2));
   } else if (unit->state == UNIT_STATE_DISABLED) {
     wattron(win, COLOR_PAIR(5));
-    mvwprintw(win, y, 2, "[ ]");
+    mvwprintw(win, y, 1, " [ ] ");
     wattroff(win, COLOR_PAIR(5));
   } else if (unit->state == UNIT_STATE_STATIC) {
     wattron(win, COLOR_PAIR(5));
-    mvwprintw(win, y, 2, "[s]");
+    mvwprintw(win, y, 1, " [s] ");
     wattroff(win, COLOR_PAIR(5));
   } else if (unit->state == UNIT_STATE_BAD) {
     wattron(win, COLOR_PAIR(1));
-    mvwprintw(win, y, 2, "-b-");
+    mvwprintw(win, y, 1, " -b- ");
     wattroff(win, COLOR_PAIR(1));
   } else if (unit->state == UNIT_STATE_MASKED) {
     wattron(win, COLOR_PAIR(3));
-    mvwprintw(win, y, 2, "-m-");
+    mvwprintw(win, y, 1, " -m- ");
     wattroff(win, COLOR_PAIR(3));
   }
 
   if (unit->sub == UNIT_SUBSTATE_RUNNING) {
-    wattron(win, COLOR_PAIR(5));
-    mvwprintw(win, y, 7, ">");
-    wattroff(win, COLOR_PAIR(5));
+    wattron(win, COLOR_PAIR(3));
+    mvwprintw(win, y, 6, " >  ");
+    wattroff(win, COLOR_PAIR(3));
   } else if (unit->state == UNIT_SUBSTATE_CONNECTED) {
     wattron(win, COLOR_PAIR(5));
-    mvwprintw(win, y, 7, "=");
+    mvwprintw(win, y, 6, " =  ");
+    wattroff(win, COLOR_PAIR(5));
+  } else {
+    wattron(win, COLOR_PAIR(5));
+    mvwprintw(win, y, 6, "    ");
     wattroff(win, COLOR_PAIR(5));
   }
 
-  mvwprintw(win, y, 10, "%s", unit->id.c_str());
+  if (unit->id.size() > ((unsigned int)winSize->w - 12)) {
+    unit->id.resize(winSize->w - 12);
+  }
+
+  std::stringstream sline;
+
+  unit->description.resize(winSize->w / 2, ' ');
+  sline << std::string(unit->id.size(), ' ') << " " << std::setw(winSize->w - 12 - unit->id.size())
+    << unit->description;
+
+  std::string cline(sline.str());
+  std::string name(unit->id);
+
+  name.resize(cline.find_first_of(unit->description[0]), ' ');
+
+  if (cline.size() > ((unsigned int)winSize->w - 12)) {
+    cline.resize(winSize->w - 12);
+  }
+
+  wattron(win, COLOR_PAIR(5));
+  mvwprintw(win, y, 10, "%s", cline.c_str());
+  wattroff(win, COLOR_PAIR(5));
+  mvwprintw(win, y, 10, "%s", name.c_str());
+}
+
+void MainWindow::drawInfo(UnitItem *unit) {
+//  mvwprintw(win, 0, 4, (char *)desc.c_str());
+//  printInMiddle(win, 0, 0, winSize->w, (char *)desc.c_str(), COLOR_PAIR(2), NULL);
 }

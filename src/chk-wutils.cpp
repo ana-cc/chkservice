@@ -44,6 +44,7 @@ void printInMiddle(WINDOW *win, int starty, int startx, int width,
       mvwprintw(win, y, i, "%c", sp);
     }
   }
+
   mvwprintw(win, y, x, "%s", string);
   wattroff(win, color);
 }

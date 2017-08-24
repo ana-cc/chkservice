@@ -32,6 +32,7 @@ class MainWindow {
     void movePageDown();
     void drawUnits();
     void drawItem(UnitItem *unit, int y);
+    void drawInfo(UnitItem *unit);
 };
 
 void startCurses();
