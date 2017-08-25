@@ -1,16 +1,17 @@
 sudo: true
+dist: trusty
 language: c++
 env:
   - DEBUG=1
 addons:
   apt:
     sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-5
-      - ssh
-      - cmake
-      - catch
+    - deadsnakes
+    - ubuntu-toolchain-r-test
+install:
+  - sudo apt-get update -qq
+  - sudo do-release-upgrade -p -f DistUpgradeViewNonInteractive
+  - sudo apt-get --yes install systemd cmake catch libsystemd-dev libncurses5-dev g++ ssh
 script:
   - mkdir build; cd build; cmake ../; make; sudo make Test
 
