@@ -1,56 +1,27 @@
-## cmake, catch c++ boilerplate
+## chkservice
 
 [![Donate](https://img.shields.io/badge/donate-3$-green.svg?style=flat-square)](https://www.linuxenko.pro/donate.html#?amount=3)
-[![Build Status](https://img.shields.io/travis/linuxenko/cccpp-boilerplate.svg?style=flat-square)](https://travis-ci.org/linuxenko/cccpp-boilerplate)
+[![Build Status](https://img.shields.io/travis/linuxenko/chkservice.svg?style=flat-square)](https://travis-ci.org/linuxenko/chkservice)
 
-Most simple and robust c++ boilerplate for cmake with catch tests.
-
-### Why ?
-
-There is alot of broken, misconfigured boilerplates. The worst part is dependencies they are trying to handle in a very wrong way.
-It is because i'd create another one for my needs and share it with you.
-
-### Installation
-
-1. Clone repository with:
-
-```
-git clone https://github.com/linuxenko/cccpp-boilerplate.git
-```
-
-2. Dependencies ! Haha, i'm sure you guess that you should install `cmake` and `catch` on your system :)
-
-```
-sudo apt install g++5 cmake catch
-```
-
-### Make the project
-
-Lets build boilerplate project
-
-```
-> mkdir build
-> cd build
-> cmake ../
-> make
-```
-
-### Make tests
-
-```
-> make Test
-```
-
-### Automatically rebuild project and run tests
-
-There is many different options to watch filesystem changes, i prefer tools from repository such as `rerun`.
-To watch, build and run tests for every file change:
-
-```
-> cd build
-> rerun -d ../src -p "**/*.cpp" "make ; make Test"
-```
+[![screenshot](https://raw.githubusercontent.com/linuxenko/linuxenko.github.io/master/media/chkservice/chkservice.png)](https://raw.githubusercontent.com/linuxenko/linuxenko.github.io/master/media/chkservice/chkservice.png)
 
 ### License
 
-Unlicensed, free for everyone :) 
+chkservice is a tool for managing systemd units.
+more infomration at https://github.com/linuxenko/chkservice
+
+Copyright (C) 2017 Svetlana Linuxenko <svetlana(at)linuxenko.pro>
+
+chkservice program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+chkservice program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
