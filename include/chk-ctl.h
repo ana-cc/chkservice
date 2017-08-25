@@ -24,7 +24,6 @@
 #include "chk-systemd.h"
 
 typedef struct UnitItem {
-  UnitInfo *sysUnit;
   std::string id;
   std::string target;
   std::string description;

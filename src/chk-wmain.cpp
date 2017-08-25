@@ -184,6 +184,7 @@ void MainWindow::reloadAll() {
 
 void MainWindow::updateUnits() {
   units.clear();
+  units.shrink_to_fit();
 
   try {
     ctl->fetch();

@@ -248,18 +248,19 @@ std::vector<UnitInfo *> ChkBus::getUnits() {
     u->id = strdup(unit.id);
     u->description = strdup(unit.description);
     u->loadState = strdup(unit.loadState);
-    u->activeState = strdup(unit.activeState);
+//    u->activeState = strdup(unit.activeState);
     u->unitPath = strdup(unit.unitPath);
-    u->following = strdup(unit.following);
-    u->jobId = unit.jobId;
-    u->jobType = strdup(unit.jobType);
-    u->jobPath = strdup(unit.jobPath);
+//    u->following = strdup(unit.following);
+//    u->jobId = unit.jobId;
+//    u->jobType = strdup(unit.jobType);
+//    u->jobPath = strdup(unit.jobPath);
 
     try {
       u->state = getState(unit.id);
     } catch (std::string &err) {
       break;
     }
+
     units.push_back(u);
   }
 
@@ -283,8 +284,6 @@ std::vector<UnitInfo *> ChkBus::getUnits() {
   return units;
 }
 
-using namespace std;
-
 std::vector<UnitInfo *> ChkBus::getAllUnits() {
   std::vector<UnitInfo *> files;
   std::vector<UnitInfo *> units;
@@ -306,41 +305,32 @@ std::vector<UnitInfo *> ChkBus::getAllUnits() {
       if (uid.find(fid) == 0) {
         files[idx]->description = unit->description;
         files[idx]->loadState = unit->loadState;
-        files[idx]->activeState = unit->activeState;
+//        files[idx]->activeState = unit->activeState;
         files[idx]->subState = unit->subState;
-        files[idx]->following = unit->following;
-        files[idx]->jobId = unit->jobId;
-        files[idx]->jobType = unit->jobType;
-        files[idx]->jobPath = unit->jobPath;
+//        files[idx]->following = unit->following;
+//        files[idx]->jobId = unit->jobId;
+//        files[idx]->jobType = unit->jobType;
+//        files[idx]->jobPath = unit->jobPath;
         if (unit->state) {
+          if (files[idx]->state) {
+            free((void *) files[idx]->state);
+          }
           files[idx]->state = unit->state;
         }
         found = true;
       }
-//      if (uid.find(fid) == 0) {
-//        files[idx]->description = strdup(unit->description);
-//        files[idx]->loadState = strdup(unit->loadState);
-//        files[idx]->activeState = strdup(unit->activeState);
-//        files[idx]->subState = strdup(unit->subState);
-//        files[idx]->following = strdup(unit->following);
-//        files[idx]->jobId = unit->jobId;
-//        files[idx]->jobType = strdup(unit->jobType);
-//        files[idx]->jobPath = strdup(unit->jobPath);
-//        if (unit->state) {
-//          files[idx]->state = strdup(unit->state);
-//        }
-//        found = true;
-//      }
       idx++;
     }
 
     if (!found) {
       files.push_back(unit);
+    } else {
+      delete unit;
     }
   }
 
   units.clear();
-
+  units.shrink_to_fit();
   return files;
 }
 

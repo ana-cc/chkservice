@@ -53,7 +53,13 @@ std::vector<UnitItem *> ChkCTL::getByTarget(const char *target) {
 
 void ChkCTL::fetch() {
   std::vector<UnitInfo *> sysUnits;
+
+  for (auto item : items) {
+    delete item;
+  }
+
   items.clear();
+  items.shrink_to_fit();
 
   try {
     sysUnits = bus->getAllUnits();
@@ -68,6 +74,7 @@ void ChkCTL::fetch() {
   }
 
   sysUnits.clear();
+  sysUnits.shrink_to_fit();
 }
 
 void ChkCTL::sortByName(std::vector<UnitItem *> *sortable) {
@@ -88,7 +95,7 @@ void ChkCTL::sortByName(std::vector<UnitItem *> *sortable) {
 void ChkCTL::pushItem(UnitInfo *unit) {
   UnitItem *item = new UnitItem();
 
-  std::string id(strdup(unit->id));
+  std::string id(unit->id);
 
   item->id = id;
   item->target = id.substr(id.find_last_of('.') + 1, id.length());
@@ -125,7 +132,17 @@ void ChkCTL::pushItem(UnitInfo *unit) {
     item->state = UNIT_STATE_MASKED;
   }
 
-  free((void *) unit->state);
+  free((void *)unit->id);
+  free((void *)unit->description);
+//  free((void *)unit->loadState);
+  free((void *)unit->activeState);
+  free((void *)unit->unitPath);
+//  free((void *)unit->following);
+//  free((void *)unit->jobType);
+//  free((void *)unit->jobPath);
+  free((void *)unit->state);
+
+  delete unit;
 
   items.push_back(item);
 };
