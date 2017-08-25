@@ -1,56 +1,42 @@
-## cmake, catch c++ boilerplate
+## chkservice
 
 [![Donate](https://img.shields.io/badge/donate-3$-green.svg?style=flat-square)](https://www.linuxenko.pro/donate.html#?amount=3)
-[![Build Status](https://img.shields.io/travis/linuxenko/cccpp-boilerplate.svg?style=flat-square)](https://travis-ci.org/linuxenko/cccpp-boilerplate)
+[![Build Status](https://img.shields.io/travis/linuxenko/chkservice.svg?style=flat-square)](https://travis-ci.org/linuxenko/chkservice)
 
-Most simple and robust c++ boilerplate for cmake with catch tests.
+[![screenshot](https://raw.githubusercontent.com/linuxenko/linuxenko.github.io/master/media/chkservice/chkservice.png)](https://raw.githubusercontent.com/linuxenko/linuxenko.github.io/master/media/chkservice/chkservice.png)
 
-### Why ?
-
-There is alot of broken, misconfigured boilerplates. The worst part is dependencies they are trying to handle in a very wrong way.
-It is because i'd create another one for my needs and share it with you.
+> chkservice is a tool for managing systemd units in terminal.
 
 ### Installation
 
-1. Clone repository with:
+
+### Usage
+
+
+### Build
+
+Build release version.
 
 ```
-git clone https://github.com/linuxenko/cccpp-boilerplate.git
+git clone https://github.com/linuxenko/chkservice.git
+mkdir build
+cd build
+cmake ../
+make
 ```
 
-2. Dependencies ! Haha, i'm sure you guess that you should install `cmake` and `catch` on your system :)
+To build debug version, `DEBUG` environment should be set
 
 ```
-sudo apt install g++5 cmake catch
-```
-
-### Make the project
-
-Lets build boilerplate project
-
-```
-> mkdir build
-> cd build
-> cmake ../
-> make
-```
-
-### Make tests
-
-```
-> make Test
-```
-
-### Automatically rebuild project and run tests
-
-There is many different options to watch filesystem changes, i prefer tools from repository such as `rerun`.
-To watch, build and run tests for every file change:
-
-```
-> cd build
-> rerun -d ../src -p "**/*.cpp" "make ; make Test"
+export DEBUG=1
+cmake ....
+make Test
 ```
 
 ### License
+GNU General Public License
 
-Unlicensed, free for everyone :) 
+chkservice is a tool for managing systemd units.
+more infomration at https://github.com/linuxenko/chkservice
+
+Copyright (C) 2017 Svetlana Linuxenko <svetlana(at)linuxenko.pro>
