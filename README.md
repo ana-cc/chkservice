@@ -5,23 +5,38 @@
 
 [![screenshot](https://raw.githubusercontent.com/linuxenko/linuxenko.github.io/master/media/chkservice/chkservice.png)](https://raw.githubusercontent.com/linuxenko/linuxenko.github.io/master/media/chkservice/chkservice.png)
 
+> chkservice is a tool for managing systemd units in terminal.
+
+### Installation
+
+
+### Usage
+
+
+### Build
+
+Build release version.
+
+```
+git clone https://github.com/linuxenko/chkservice.git
+mkdir build
+cd build
+cmake ../
+make
+```
+
+To build debug version, `DEBUG` environment should be set
+
+```
+export DEBUG=1
+cmake ....
+make Test
+```
+
 ### License
+GNU General Public License
 
 chkservice is a tool for managing systemd units.
 more infomration at https://github.com/linuxenko/chkservice
 
 Copyright (C) 2017 Svetlana Linuxenko <svetlana(at)linuxenko.pro>
-
-chkservice program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-chkservice program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
