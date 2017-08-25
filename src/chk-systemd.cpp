@@ -248,6 +248,7 @@ std::vector<UnitInfo *> ChkBus::getUnits() {
     u->id = strdup(unit.id);
     u->description = strdup(unit.description);
     u->loadState = strdup(unit.loadState);
+    u->subState = strdup(unit.subState);
 //    u->activeState = strdup(unit.activeState);
     u->unitPath = strdup(unit.unitPath);
 //    u->following = strdup(unit.following);
@@ -303,21 +304,23 @@ std::vector<UnitInfo *> ChkBus::getAllUnits() {
       std::string fid(file->id);
 
       if (uid.find(fid) == 0) {
+        free((void *)files[idx]->id);
+        files[idx]->id = unit->id;
+
+        free((void *)files[idx]->unitPath);
+        files[idx]->unitPath = unit->unitPath;
+
         files[idx]->description = unit->description;
         files[idx]->loadState = unit->loadState;
-//        files[idx]->activeState = unit->activeState;
         files[idx]->subState = unit->subState;
-//        files[idx]->following = unit->following;
-//        files[idx]->jobId = unit->jobId;
-//        files[idx]->jobType = unit->jobType;
-//        files[idx]->jobPath = unit->jobPath;
-        if (unit->state) {
-          if (files[idx]->state) {
-            free((void *) files[idx]->state);
-          }
-          files[idx]->state = unit->state;
-        }
+
+//        if (!files[idx]->state) {
+//          files[idx]->state = strdup(unit->state);
+//        }
+
+//        free((void *)unit->state);
         found = true;
+        break;
       }
       idx++;
     }

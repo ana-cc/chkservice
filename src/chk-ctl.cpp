@@ -67,10 +67,11 @@ void ChkCTL::fetch() {
     throw err;
   }
 
-  for (const auto unit : sysUnits) {
+  for (auto unit : sysUnits) {
     if (unit->id) {
       pushItem(unit);
     }
+    delete unit;
   }
 
   sysUnits.clear();
@@ -108,21 +109,21 @@ void ChkCTL::pushItem(UnitInfo *unit) {
 
     if (state.find("enabled") == 0) {
       item->state = UNIT_STATE_ENABLED;
-    } else if (state.find("disabled") == 0) {
-      item->state = UNIT_STATE_DISABLED;
+    } else if (state.find("mask") == 0) {
+      item->state = UNIT_STATE_MASKED;
     } else if (state.find("static") == 0) {
       item->state = UNIT_STATE_STATIC;
-    } else if (state.find("bad") == 0) {
+    } else if (state.find("bad") == 0 || state.find("removed") == 0) {
       item->state = UNIT_STATE_BAD;
     } else {
-      item->state = UNIT_STATE_MASKED;
+      item->state = UNIT_STATE_DISABLED;
     }
 
     if (!sub.empty()) {
       if (sub.find("running") == 0) {
         item->sub = UNIT_SUBSTATE_RUNNING;
       } else {
-        item->state = UNIT_SUBSTATE_CONNECTED;
+        item->sub = UNIT_SUBSTATE_CONNECTED;
       }
     } else {
         item->sub = UNIT_SUBSTATE_INVALID;
@@ -134,15 +135,10 @@ void ChkCTL::pushItem(UnitInfo *unit) {
 
   free((void *)unit->id);
   free((void *)unit->description);
-//  free((void *)unit->loadState);
   free((void *)unit->activeState);
   free((void *)unit->unitPath);
-//  free((void *)unit->following);
-//  free((void *)unit->jobType);
-//  free((void *)unit->jobPath);
+  free((void *)unit->subState);
   free((void *)unit->state);
-
-  delete unit;
 
   items.push_back(item);
 };
@@ -194,17 +190,18 @@ std::vector<UnitItem *> ChkCTL::getItemsSorted() {
 
 void ChkCTL::toggleUnitState(UnitItem *item) {
   try {
-    if (item->state == UNIT_STATE_ENABLED ||
-        item->state == UNIT_STATE_STATIC) {
+    if (item->state == UNIT_STATE_ENABLED || item->state == UNIT_STATE_STATIC) {
 
+      if (item->sub == UNIT_SUBSTATE_RUNNING || item->sub == UNIT_SUBSTATE_CONNECTED) {
+        bus->stopUnit(item->id.c_str());
+      }
       bus->disableUnit(item->id.c_str());
-      item->state = UNIT_STATE_DISABLED;
 
     } else if (item->state == UNIT_STATE_DISABLED) {
-
       bus->enableUnit(item->id.c_str());
-      item->state = UNIT_STATE_ENABLED;
     }
+
+    item->state = UNIT_STATE_TMP;
   } catch (std::string &err) {
     throw err;
   }
@@ -214,11 +211,11 @@ void ChkCTL::toggleUnitSubState(UnitItem *item) {
   try {
     if (item->sub != UNIT_SUBSTATE_RUNNING) {
       bus->startUnit(item->id.c_str());
-      item->sub = UNIT_SUBSTATE_RUNNING;
     } else {
       bus->stopUnit(item->id.c_str());
-      item->sub = UNIT_SUBSTATE_CONNECTED;
     }
+
+    item->sub = UNIT_SUBSTATE_TMP;
   } catch (std::string &err) {
     throw err;
   }

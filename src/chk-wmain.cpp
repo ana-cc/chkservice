@@ -238,6 +238,12 @@ void MainWindow::drawItem(UnitItem *unit, int y) {
     return;
   }
 
+
+//    if (unit->id.find("acpid.service") == 0) {
+//      std::cout << unit->id << " " << unit->state << UNIT_STATE_DISABLED <<  std::endl;
+//      exit(0);
+//    }
+
   if (unit->state == UNIT_STATE_ENABLED) {
     wattron(win, COLOR_PAIR(2));
     mvwprintw(win, y, padding->x, "[x]");
@@ -264,7 +270,7 @@ void MainWindow::drawItem(UnitItem *unit, int y) {
     wattron(win, COLOR_PAIR(3));
     mvwprintw(win, y, padding->x + 3, "  >  ");
     wattroff(win, COLOR_PAIR(3));
-  } else if (unit->state == UNIT_SUBSTATE_CONNECTED) {
+  } else if (unit->sub == UNIT_SUBSTATE_CONNECTED) {
     wattron(win, COLOR_PAIR(5));
     mvwprintw(win, y, padding->x + 3, "  =  ");
     wattroff(win, COLOR_PAIR(5));
@@ -341,6 +347,7 @@ void MainWindow::error(char *err) {
 void MainWindow::toggleUnitState() {
   try {
     ctl->toggleUnitState(units[start + selected]);
+    reloadAll();
   } catch (std::string &err) {
     error((char *)err.c_str());
   }
@@ -349,6 +356,7 @@ void MainWindow::toggleUnitState() {
 void MainWindow::toggleUnitSubState() {
   try {
     ctl->toggleUnitSubState(units[start + selected]);
+    reloadAll();
   } catch (std::string &err) {
     error((char *)err.c_str());
   }
