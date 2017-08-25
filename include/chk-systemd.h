@@ -60,9 +60,9 @@ class ChkBus {
     void setErrorMessage(int status);
     void setErrorMessage(const char *message);
 
-    std::vector<UnitInfo> getUnits();
-    std::vector<UnitInfo> getUnitFiles();
-    std::vector<UnitInfo> getAllUnits();
+    std::vector<UnitInfo *> getUnits();
+    std::vector<UnitInfo *> getUnitFiles();
+    std::vector<UnitInfo *> getAllUnits();
 
     void disableUnit(const char *name);
     void enableUnit(const char *name);

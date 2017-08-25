@@ -52,7 +52,7 @@ std::vector<UnitItem *> ChkCTL::getByTarget(const char *target) {
 }
 
 void ChkCTL::fetch() {
-  std::vector<UnitInfo> sysUnits;
+  std::vector<UnitInfo *> sysUnits;
   items.clear();
 
   try {
@@ -62,7 +62,7 @@ void ChkCTL::fetch() {
   }
 
   for (const auto unit : sysUnits) {
-    if (unit.id) {
+    if (unit->id) {
       pushItem(unit);
     }
   }
@@ -85,19 +85,19 @@ void ChkCTL::sortByName(std::vector<UnitItem *> *sortable) {
   });
 }
 
-void ChkCTL::pushItem(UnitInfo unit) {
+void ChkCTL::pushItem(UnitInfo *unit) {
   UnitItem *item = new UnitItem();
 
-  std::string id(strdup(unit.id));
+  std::string id(strdup(unit->id));
 
   item->id = id;
   item->target = id.substr(id.find_last_of('.') + 1, id.length());
-  item->description = std::string((unit.description == NULL ?
-      unit.unitPath : unit.description));
+  item->description = std::string((unit->description == NULL ?
+      unit->unitPath : unit->description));
 
-  if (unit.state != NULL) {
-    std::string state(unit.state);
-    std::string sub(unit.subState == NULL ? "" : unit.subState);
+  if (unit->state != NULL) {
+    std::string state(unit->state);
+    std::string sub(unit->subState == NULL ? "" : unit->subState);
 
     if (state.find("enabled") == 0) {
       item->state = UNIT_STATE_ENABLED;
@@ -125,7 +125,7 @@ void ChkCTL::pushItem(UnitInfo unit) {
     item->state = UNIT_STATE_MASKED;
   }
 
-  free((void *) unit.state);
+  free((void *) unit->state);
 
   items.push_back(item);
 };
@@ -182,7 +182,9 @@ void ChkCTL::toggleUnitState(UnitItem *item) {
 
       bus->disableUnit(item->id.c_str());
       item->state = UNIT_STATE_DISABLED;
+
     } else if (item->state == UNIT_STATE_DISABLED) {
+
       bus->enableUnit(item->id.c_str());
       item->state = UNIT_STATE_ENABLED;
     }

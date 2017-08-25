@@ -124,11 +124,11 @@ const char *ChkBus::getState(const char *name) {
   return status < 0 ? NULL : strdup(state);
 }
 
-std::vector<UnitInfo> ChkBus::getUnitFiles() {
+std::vector<UnitInfo *> ChkBus::getUnitFiles() {
   int status;
   const char *state;
   char *path;
-  std::vector<UnitInfo> units;
+  std::vector<UnitInfo *> units;
 
   sd_bus_message* busMessage = NULL;
   sd_bus_message* reply = NULL;
@@ -173,10 +173,10 @@ std::vector<UnitInfo> ChkBus::getUnitFiles() {
     unit->unitPath = strdup(path);
     unit->state = strdup(state);
 
-    std::string p = std::string(strdup(unit->unitPath));
+    std::string p = std::string(unit->unitPath);
     unit->id = strdup(p.substr(p.find_last_of("/") + 1, p.length()).c_str());
 
-    units.push_back((*unit));
+    units.push_back(unit);
   }
 
   status = sd_bus_message_exit_container(reply);
@@ -196,16 +196,13 @@ std::vector<UnitInfo> ChkBus::getUnitFiles() {
       throw std::string(errorMessage);
     }
 
-  for (std::vector<UnitInfo>::iterator iter = units.begin(); iter != units.end(); iter++) {
-  }
-
   return units;
 }
 
-std::vector<UnitInfo> ChkBus::getUnits() {
+std::vector<UnitInfo *> ChkBus::getUnits() {
   int status;
   UnitInfo unit;
-  std::vector<UnitInfo> units;
+  std::vector<UnitInfo *> units;
 
   sd_bus_message* busMessage = NULL;
   sd_bus_message* reply = NULL;
@@ -246,12 +243,24 @@ std::vector<UnitInfo> ChkBus::getUnits() {
   }
 
   while ((status = busParseUnit(reply, &unit)) > 0) {
+    UnitInfo *u = new UnitInfo();
+
+    u->id = strdup(unit.id);
+    u->description = strdup(unit.description);
+    u->loadState = strdup(unit.loadState);
+    u->activeState = strdup(unit.activeState);
+    u->unitPath = strdup(unit.unitPath);
+    u->following = strdup(unit.following);
+    u->jobId = unit.jobId;
+    u->jobType = strdup(unit.jobType);
+    u->jobPath = strdup(unit.jobPath);
+
     try {
-      unit.state = getState(unit.id);
+      u->state = getState(unit.id);
     } catch (std::string &err) {
       break;
     }
-    units.push_back(unit);
+    units.push_back(u);
   }
 
   status = sd_bus_message_exit_container(reply);
@@ -274,9 +283,11 @@ std::vector<UnitInfo> ChkBus::getUnits() {
   return units;
 }
 
-std::vector<UnitInfo> ChkBus::getAllUnits() {
-  std::vector<UnitInfo> files;
-  std::vector<UnitInfo> units;
+using namespace std;
+
+std::vector<UnitInfo *> ChkBus::getAllUnits() {
+  std::vector<UnitInfo *> files;
+  std::vector<UnitInfo *> units;
 
   try {
     files = getUnitFiles();
@@ -289,23 +300,37 @@ std::vector<UnitInfo> ChkBus::getAllUnits() {
     int idx = 0;
     bool found = false;
     for (auto file : files) {
-      std::string uid(unit.id);
-      std::string fid(file.id);
+      std::string uid(unit->id);
+      std::string fid(file->id);
 
       if (uid.find(fid) == 0) {
-        files[idx].description = strdup(unit.description);
-        files[idx].loadState = strdup(unit.loadState);
-        files[idx].activeState = strdup(unit.activeState);
-        files[idx].subState = strdup(unit.subState);
-        files[idx].following = strdup(unit.following);
-        files[idx].jobId = unit.jobId;
-        files[idx].jobType = strdup(unit.jobType);
-        files[idx].jobPath = strdup(unit.jobPath);
-        if (unit.state) {
-          files[idx].state = strdup(unit.state);
+        files[idx]->description = unit->description;
+        files[idx]->loadState = unit->loadState;
+        files[idx]->activeState = unit->activeState;
+        files[idx]->subState = unit->subState;
+        files[idx]->following = unit->following;
+        files[idx]->jobId = unit->jobId;
+        files[idx]->jobType = unit->jobType;
+        files[idx]->jobPath = unit->jobPath;
+        if (unit->state) {
+          files[idx]->state = unit->state;
         }
         found = true;
       }
+//      if (uid.find(fid) == 0) {
+//        files[idx]->description = strdup(unit->description);
+//        files[idx]->loadState = strdup(unit->loadState);
+//        files[idx]->activeState = strdup(unit->activeState);
+//        files[idx]->subState = strdup(unit->subState);
+//        files[idx]->following = strdup(unit->following);
+//        files[idx]->jobId = unit->jobId;
+//        files[idx]->jobType = strdup(unit->jobType);
+//        files[idx]->jobPath = strdup(unit->jobPath);
+//        if (unit->state) {
+//          files[idx]->state = strdup(unit->state);
+//        }
+//        found = true;
+//      }
       idx++;
     }
 

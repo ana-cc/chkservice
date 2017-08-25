@@ -59,7 +59,7 @@ class ChkCTL {
     void fetch();
   private:
     std::vector<UnitItem *> items;
-    void pushItem(UnitInfo unit);
+    void pushItem(UnitInfo *unit);
     void sortByName(std::vector<UnitItem *> *sortable);
 };
 
