@@ -41,11 +41,7 @@ typedef struct UnitInfo {
   const char *loadState;
   const char *activeState;
   const char *subState;
-  const char *following;
   const char *unitPath;
-  uint32_t jobId;
-  const char *jobType;
-  const char *jobPath;
   const char *state;
 } UnitInfo;
 

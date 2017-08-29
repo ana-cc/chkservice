@@ -35,11 +35,11 @@ int busParseUnit(sd_bus_message *message, UnitInfo *u) {
     &u->loadState,
     &u->activeState,
     &u->subState,
-    &u->following,
+    NULL,
     &u->unitPath,
-    &u->jobId,
-    &u->jobType,
-    &u->jobPath);
+    NULL,
+    NULL,
+    NULL);
 }
 
 void applySYSv(const char *state, const char **names) {

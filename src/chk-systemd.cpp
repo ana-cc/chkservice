@@ -177,6 +177,9 @@ std::vector<UnitInfo *> ChkBus::getUnitFiles() {
     unit->id = strdup(p.substr(p.find_last_of("/") + 1, p.length()).c_str());
 
     units.push_back(unit);
+
+    path = NULL;
+    state = NULL;
   }
 
   status = sd_bus_message_exit_container(reply);
@@ -305,8 +308,13 @@ std::vector<UnitInfo *> ChkBus::getAllUnits() {
         free((void *)files[idx]->unitPath);
         files[idx]->unitPath = unit->unitPath;
 
+        free((void *)files[idx]->description);
         files[idx]->description = unit->description;
+
+        free((void *)files[idx]->loadState);
         files[idx]->loadState = unit->loadState;
+
+        free((void *)files[idx]->subState);
         files[idx]->subState = unit->subState;
 
         found = true;
