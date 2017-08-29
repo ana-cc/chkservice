@@ -133,12 +133,7 @@ void ChkCTL::pushItem(UnitInfo *unit) {
     item->state = UNIT_STATE_MASKED;
   }
 
-  free((void *)unit->id);
-  free((void *)unit->description);
-  free((void *)unit->activeState);
-  free((void *)unit->unitPath);
-  free((void *)unit->subState);
-  free((void *)unit->state);
+  bus->freeUnitInfo(unit);
 
   items.push_back(item);
 };

@@ -283,6 +283,14 @@ std::vector<UnitInfo *> ChkBus::getUnits() {
   return units;
 }
 
+void ChkBus::freeUnitInfo(UnitInfo *unit) {
+  free((void *)unit->id);
+  free((void *)unit->unitPath);
+  free((void *)unit->description);
+  free((void *)unit->loadState);
+  free((void *)unit->subState);
+}
+
 std::vector<UnitInfo *> ChkBus::getAllUnits() {
   std::vector<UnitInfo *> files;
   std::vector<UnitInfo *> units;
@@ -302,19 +310,12 @@ std::vector<UnitInfo *> ChkBus::getAllUnits() {
       std::string fid(file->id);
 
       if (uid.find(fid) == 0) {
-        free((void *)files[idx]->id);
+        freeUnitInfo(files[idx]);
+
         files[idx]->id = unit->id;
-
-        free((void *)files[idx]->unitPath);
         files[idx]->unitPath = unit->unitPath;
-
-        free((void *)files[idx]->description);
         files[idx]->description = unit->description;
-
-        free((void *)files[idx]->loadState);
         files[idx]->loadState = unit->loadState;
-
-        free((void *)files[idx]->subState);
         files[idx]->subState = unit->subState;
 
         found = true;

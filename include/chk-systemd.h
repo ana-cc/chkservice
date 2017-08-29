@@ -71,6 +71,8 @@ class ChkBus {
     void startUnits(std::set<std::string> *ids);
     void stopUnits(std::set<std::string> *ids);
 
+    static void freeUnitInfo(UnitInfo *unit);
+
     void reloadDaemon();
 
   private:
