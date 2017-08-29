@@ -249,12 +249,7 @@ std::vector<UnitInfo *> ChkBus::getUnits() {
     u->description = strdup(unit.description);
     u->loadState = strdup(unit.loadState);
     u->subState = strdup(unit.subState);
-//    u->activeState = strdup(unit.activeState);
     u->unitPath = strdup(unit.unitPath);
-//    u->following = strdup(unit.following);
-//    u->jobId = unit.jobId;
-//    u->jobType = strdup(unit.jobType);
-//    u->jobPath = strdup(unit.jobPath);
 
     try {
       u->state = getState(unit.id);
@@ -314,11 +309,6 @@ std::vector<UnitInfo *> ChkBus::getAllUnits() {
         files[idx]->loadState = unit->loadState;
         files[idx]->subState = unit->subState;
 
-//        if (!files[idx]->state) {
-//          files[idx]->state = strdup(unit->state);
-//        }
-
-//        free((void *)unit->state);
         found = true;
         break;
       }
@@ -430,6 +420,12 @@ void ChkBus::applyUnitState(const char *method, char **names, int flags) {
   if (status < 0) {
     setErrorMessage(error.message);
     goto finish;
+  }
+
+  if (flags == STATE_FLAGS_ENABLE) {
+    applySYSv("enable", (const char **)names);
+  } else if (flags == STATE_FLAGS_DISABLE) {
+    applySYSv("disable", (const char **)names);
   }
 
   finish:

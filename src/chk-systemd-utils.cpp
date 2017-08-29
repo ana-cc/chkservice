@@ -20,6 +20,8 @@
 
 #include "chk-systemd.h"
 #include <cassert>
+#include <unistd.h>
+#include <sys/wait.h>
 
 int busParseUnit(sd_bus_message *message, UnitInfo *u) {
   assert(message);
@@ -38,4 +40,27 @@ int busParseUnit(sd_bus_message *message, UnitInfo *u) {
     &u->jobId,
     &u->jobType,
     &u->jobPath);
+}
+
+void applySYSv(const char *state, const char **names) {
+  int pid = fork();
+
+  if (pid == 0) {
+    for (int i = 0; names[i] != NULL; i++) {
+      std::string unitName(names[i]);
+      std::string sysvCMD = SYSV_INSTALL_EXEC;
+
+      unitName = unitName.substr(0, unitName.find_last_of('.'));
+      sysvCMD += " ";
+      sysvCMD += state;
+      sysvCMD += " ";
+      sysvCMD += unitName;
+      sysvCMD += " > /dev/null 2>&1";
+
+     system(sysvCMD.c_str());
+    }
+    exit(0);
+  } else {
+    waitpid(pid, NULL, 0);
+  }
 }

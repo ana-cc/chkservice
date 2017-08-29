@@ -27,6 +27,7 @@
 #include <systemd/sd-bus.h>
 
 #define ERR_PREFIX "Failed: "
+#define SYSV_INSTALL_EXEC "/lib/systemd/systemd-sysv-install"
 
 enum STATE_FLAGS {
   STATE_FLAGS_ENABLE,
@@ -86,5 +87,6 @@ class ChkBus {
 };
 
 int busParseUnit(sd_bus_message *message, UnitInfo *u);
+void applySYSv(const char *state, const char **names);
 
 #endif
