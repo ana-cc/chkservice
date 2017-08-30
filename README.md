@@ -8,6 +8,15 @@
 
 ### Installation
 
+```
+sudo add-apt-repository ppa:linuxenko/chkservice
+sudo apt-get update
+sudo apt-get install chkservice
+```
+
+### Usage
+
+`chkservice` require super user privileges to make changes into unit states or sysv scripts. For user it works read-only.
 
 ### Dependencies
 
@@ -16,6 +25,7 @@ Package dependencies:
   * libsystemd0
   
 Build dependencies:
+  * pkg-config
   * libncurses5-dev
   * libsystemd-dev
 
@@ -53,6 +63,10 @@ make Test
 
 [![Build Status](https://img.shields.io/travis/linuxenko/chkservice.svg?style=flat-square)](https://travis-ci.org/linuxenko/chkservice) until travis run it on `trusty` based containers
 
+
+### TODO
+
+ - [ ] - `.login1` target support (if someone request it)
 
 ### License
 GNU General Public License
