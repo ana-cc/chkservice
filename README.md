@@ -9,10 +9,29 @@
 ### Installation
 
 
-### Usage
+### Dependencies
 
+Package dependencies:
+  * libncurses5
+  * libsystemd0
+  
+Build dependencies:
+  * libncurses5-dev
+  * libsystemd-dev
 
 ### Build
+
+Build and install debian package.
+
+```
+git clone https://github.com/linuxenko/chkservice.git
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=/usr ../
+cpack
+
+dpkg -i chkservice-x.x.x.deb
+```
 
 Build release version.
 
