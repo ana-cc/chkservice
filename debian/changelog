@@ -1,0 +1,17 @@
+chkservice (0.1.0.2ppa0ubuntu2) xenial; urgency=medium
+
+  * Updated launchpad build dependencies
+
+ -- Svetlana Linuxenko <svetlana@linuxenko.pro>  Wed, 30 Aug 2017 14:38:21 +0300
+
+chkservice (0.1.0.1ppa0ubuntu1) xenial; urgency=medium
+
+  * Reupload first try
+
+ -- Svetlana Linuxenko <svetlana@linuxenko.pro>  Wed, 30 Aug 2017 14:27:35 +0300
+
+chkservice (0.1.0.0ppa0) sveta; urgency=medium
+
+  * Initial release. (Closes: #XXXXXX)
+
+ -- Svetlana Linuxenko <svetlana@linuxenko.pro>  Wed, 30 Aug 2017 13:36:50 +0300

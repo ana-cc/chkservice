@@ -1,0 +1,11 @@
+Source: chkservice
+Section: devel
+Priority: optional
+Maintainer: Svetlana Linuxenko <svetlana@linuxenko.pro>
+Build-Depends: pkg-config, cmake, build-essential, libncurses5-dev, libsystemd-dev
+Homepage: https://github.com/linuxenko/chkservice
+
+Package: chkservice
+Architecture: any
+Depends: libncurses5, libsystemd0
+Description: Ncurses based gui for systemd
