@@ -14,6 +14,14 @@ sudo apt-get update
 sudo apt-get install chkservice
 ```
 
+Arch
+
+```
+git clone https://aur.archlinux.org/chkservice.git
+cd chkservice
+makepkg -si
+```
+
 ### Usage
 
 `chkservice` require super user privileges to make changes into unit states or sysv scripts. For user it works read-only.
