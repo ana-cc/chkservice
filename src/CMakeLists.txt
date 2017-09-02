@@ -10,4 +10,4 @@ target_link_libraries(CHKUI ${LIBS} CHKSYSTEMD CHKCTL)
 add_executable(chkservice chkservice.cpp)
 target_link_libraries(chkservice ${LIBS} CHKSYSTEMD CHKCTL CHKUI)
 
-install(TARGETS chkservice RUNTIME DESTINATION sbin)
+install(TARGETS chkservice RUNTIME DESTINATION bin)
