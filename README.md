@@ -22,6 +22,11 @@ cd chkservice
 makepkg -si
 ```
 
+Fedora
+```
+dnf copr enable srakitnican/default
+dnf install chkservice
+```
 ### Usage
 
 `chkservice` require super user privileges to make changes into unit states or sysv scripts. For user it works read-only.
