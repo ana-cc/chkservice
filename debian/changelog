@@ -1,3 +1,9 @@
+chkservice (0.1.0.2ppa0ubuntu3) xenial; urgency=medium
+
+  * Check of sysv status
+
+ -- Svetlana Linuxenko <svetlana@linuxenko.pro>  Thu, 14 Sep 2017 15:53:23 +0300
+
 chkservice (0.1.0.2ppa0ubuntu2) xenial; urgency=medium
 
   * Updated launchpad build dependencies
