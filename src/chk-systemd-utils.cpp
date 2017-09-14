@@ -44,6 +44,7 @@ int busParseUnit(sd_bus_message *message, UnitInfo *u) {
 
 void applySYSv(const char *state, const char **names) {
   int pid = fork();
+  int status;
 
   if (pid == 0) {
     for (int i = 0; names[i] != NULL; i++) {
@@ -57,9 +58,11 @@ void applySYSv(const char *state, const char **names) {
       sysvCMD += unitName;
       sysvCMD += " > /dev/null 2>&1";
 
-     system(sysvCMD.c_str());
+      if ((status = system(sysvCMD.c_str())) == -1) {
+        break;
+      }
     }
-    exit(0);
+    exit(status);
   } else {
     waitpid(pid, NULL, 0);
   }
