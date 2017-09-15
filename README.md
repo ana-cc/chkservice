@@ -35,12 +35,12 @@ dnf install chkservice
 
 Package dependencies:
   * libncurses5
-  * libsystemd0
+  * libsystemd0 ( >= 222 )
   
 Build dependencies:
   * pkg-config
   * libncurses5-dev
-  * libsystemd-dev
+  * libsystemd-dev ( >= 222 )
 
 ### Build
 
